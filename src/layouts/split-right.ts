@@ -1,6 +1,6 @@
 // Layout: Split Right - Text panel left 50%, image right 50% (mirror of split-left)
 import type { Layout, LayoutRenderParams } from '../lib/types';
-import { escapeHtml, sanitizeColor, sanitizeUrlForCss } from '../lib/html-helpers';
+import { escapeHtml, sanitizeColor, sanitizeUrlForCss, logoPositionStyle, watermarkHtml } from '../lib/html-helpers';
 
 export const splitRightLayout: Layout = {
   id: 'split-right',
@@ -26,8 +26,9 @@ export const splitRightLayout: Layout = {
     const safeLogo = sanitizeUrlForCss(p.logo);
 
     const logoHtml = safeLogo
-      ? `<img src="${safeLogo}" alt="logo" style="position:absolute;top:5%;left:5%;height:10%;max-width:30%;object-fit:contain;" crossorigin="anonymous" onerror="this.style.display='none'" />`
+      ? `<img src="${safeLogo}" alt="logo" style="position:absolute;${logoPositionStyle(p.logo_position)};height:10%;max-width:30%;object-fit:contain;" crossorigin="anonymous" onerror="this.style.display='none'" />`
       : '';
+    const wmHtml = watermarkHtml(p.watermark_url, p.watermark_opacity);
 
     const subtitleHtml = subtitle
       ? `<p style="color:${accentColor};font-weight:500;font-size:clamp(0.8rem,2vw,1.4rem);margin-top:0.6em;opacity:0.9;font-family:'Be Vietnam Pro',sans-serif;overflow:hidden;text-overflow:ellipsis;">${subtitle}</p>`
@@ -45,6 +46,7 @@ export const splitRightLayout: Layout = {
   <div style="width:50%;height:100%;flex-shrink:0;overflow:hidden;">
     <img src="${imgUrl}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" crossorigin="anonymous" onerror="this.style.background='#333'" />
   </div>
+  ${wmHtml}
 </div>`;
   },
 };

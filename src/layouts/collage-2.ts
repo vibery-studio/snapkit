@@ -1,6 +1,6 @@
 // Layout: Collage 2 - Two images side by side with title bar at bottom
 import type { Layout, LayoutRenderParams } from '../lib/types';
-import { escapeHtml, sanitizeColor, sanitizeUrlForCss } from '../lib/html-helpers';
+import { escapeHtml, sanitizeColor, sanitizeUrlForCss, logoPositionStyle, watermarkHtml } from '../lib/html-helpers';
 
 export const collage2Layout: Layout = {
   id: 'collage-2',
@@ -18,14 +18,14 @@ export const collage2Layout: Layout = {
     const bg = sanitizeColor(p.bg_color, '#111111');
     const titleColor = sanitizeColor(p.title_color, '#FFFFFF');
     const title = escapeHtml(p.title);
-    const params = p as unknown as Record<string, string>;
-    const img1 = sanitizeUrlForCss(params.image_1);
-    const img2 = sanitizeUrlForCss(params.image_2);
+    const img1 = sanitizeUrlForCss(p.image_1);
+    const img2 = sanitizeUrlForCss(p.image_2);
     const safeLogo = sanitizeUrlForCss(p.logo);
 
     const logoHtml = safeLogo
-      ? `<img src="${safeLogo}" alt="logo" style="position:absolute;top:5%;right:5%;height:9%;max-width:25%;object-fit:contain;z-index:2;" crossorigin="anonymous" onerror="this.style.display='none'" />`
+      ? `<img src="${safeLogo}" alt="logo" style="position:absolute;${logoPositionStyle(p.logo_position)};height:9%;max-width:25%;object-fit:contain;z-index:2;" crossorigin="anonymous" onerror="this.style.display='none'" />`
       : '';
+    const wmHtml = watermarkHtml(p.watermark_url, p.watermark_opacity);
 
     // Images take top 78%, title bar takes bottom 22%
     // Each image is 40% wide with gap, centered horizontally
@@ -42,6 +42,7 @@ export const collage2Layout: Layout = {
   <div style="height:22%;display:flex;align-items:center;justify-content:center;padding:0 6%;box-sizing:border-box;border-top:2px solid rgba(255,255,255,0.1);">
     <h1 style="color:${titleColor};font-weight:800;font-size:clamp(0.9rem,3vw,2rem);line-height:1.2;margin:0;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${title}</h1>
   </div>
+  ${wmHtml}
 </div>`;
   },
 };

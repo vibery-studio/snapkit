@@ -80,8 +80,13 @@ export interface LayoutRenderParams {
   title_color?: string;
   subtitle_color?: string;
   logo?: string;
+  logo_position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   feature_image?: string;
+  image_1?: string;
+  image_2?: string;
   overlay?: 'none' | 'light' | 'medium' | 'dark';
+  watermark_url?: string;
+  watermark_opacity?: 'light' | 'medium' | 'dark';
 }
 
 export interface Design {
@@ -96,6 +101,7 @@ export interface Design {
   layout: string;
   brand: string;
   params: Record<string, string | boolean | number>;
+  forked_from?: string; // ID of source design if forked
 }
 
 export interface BackgroundItem {

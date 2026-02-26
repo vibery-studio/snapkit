@@ -1,6 +1,6 @@
 // Layout: Text Only - Bold text on solid or gradient background, no images
 import type { Layout, LayoutRenderParams } from '../lib/types';
-import { escapeHtml, sanitizeColor } from '../lib/html-helpers';
+import { escapeHtml, sanitizeColor, logoPositionStyle, watermarkHtml } from '../lib/html-helpers';
 
 export const textOnlyLayout: Layout = {
   id: 'text-only',
@@ -30,8 +30,9 @@ export const textOnlyLayout: Layout = {
       : `background:${bgStart}`;
 
     const logoHtml = p.logo
-      ? `<img src="${p.logo}" alt="logo" style="position:absolute;bottom:5%;right:5%;height:8%;max-width:25%;object-fit:contain;" crossorigin="anonymous" onerror="this.style.display='none'" />`
+      ? `<img src="${p.logo}" alt="logo" style="position:absolute;${logoPositionStyle(p.logo_position)};height:8%;max-width:25%;object-fit:contain;" crossorigin="anonymous" onerror="this.style.display='none'" />`
       : '';
+    const wmHtml = watermarkHtml(p.watermark_url, p.watermark_opacity);
 
     const subtitleHtml = subtitle
       ? `<p style="color:${subColor};font-weight:500;font-size:clamp(0.85rem,2.5vw,1.6rem);margin:0.6em 0 0;opacity:0.9;font-family:'Be Vietnam Pro',sans-serif;overflow:hidden;text-overflow:ellipsis;">${subtitle}</p>`
@@ -41,6 +42,7 @@ export const textOnlyLayout: Layout = {
   ${logoHtml}
   <h1 style="color:${titleColor};font-weight:900;font-size:clamp(1.5rem,6vw,4.5rem);line-height:1.15;margin:0;letter-spacing:-0.02em;overflow:hidden;text-overflow:ellipsis;">${title}</h1>
   ${subtitleHtml}
+  ${wmHtml}
 </div>`;
   },
 };

@@ -1,5 +1,7 @@
 // Layout registry - exports all available layouts
-import type { Layout } from '../lib/types';
+import type { Env, Layout } from '../lib/types';
+import { r2GetJson } from '../lib/r2-helpers';
+import { createLayoutFromTemplate, type CustomLayoutData } from '../lib/template-engine';
 import { overlayCenterLayout } from './overlay-center';
 import { splitLeftLayout } from './split-left';
 import { splitRightLayout } from './split-right';
@@ -28,4 +30,23 @@ export function getLayoutById(id: string): Layout | undefined {
 
 export function getLayoutsForCategory(category: string): Layout[] {
   return Object.values(LAYOUTS).filter(l => l.categories.includes(category as any));
+}
+
+/**
+ * Resolve layout by ID: built-in registry first, then R2 custom layouts.
+ * Returns null if not found in either.
+ */
+export async function resolveLayout(id: string, env: Env): Promise<Layout | null> {
+  // Fast path: built-in layout
+  if (LAYOUTS[id]) return LAYOUTS[id];
+
+  // Slow path: fetch custom layout JSON from R2
+  try {
+    const data = await r2GetJson<CustomLayoutData>(env, `layouts/${id}.json`);
+    if (data) return createLayoutFromTemplate(data);
+  } catch {
+    // R2 miss or parse error — fall through to null
+  }
+
+  return null;
 }

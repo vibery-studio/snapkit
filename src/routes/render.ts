@@ -46,7 +46,7 @@ export async function handleRender(url: URL, env: Env): Promise<Response> {
   });
 
   try {
-    const html = renderInlineToHTML(layoutId, sizeId, params);
+    const html = await renderInlineToHTML(layoutId, sizeId, params, env);
     return htmlResponse(html);
   } catch (e) {
     console.error('Render inline error:', e);

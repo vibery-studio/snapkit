@@ -69,11 +69,22 @@ export async function updateDesign(
   return updated;
 }
 
-// Fork a design: copy with a new ID and reset timestamps
+// Fork a design: copy with new ID, reset timestamps, track origin via forked_from
 export async function forkDesign(id: string, env: Env): Promise<Design | null> {
   const source = await getDesign(id, env);
   if (!source) return null;
 
-  const { id: _id, created_at: _c, updated_at: _u, ...rest } = source;
-  return saveDesign(rest, env);
+  // Strip identity/timestamp fields, preserve all design data
+  const { id: _id, created_at: _c, updated_at: _u, forked_from: _f, ...rest } = source;
+  const forkedDesign = await saveDesign(rest, env);
+
+  // Update with forked_from reference
+  const withRef: Design = { ...forkedDesign, forked_from: id };
+  await r2PutJson(env, designKey(forkedDesign.id), withRef, {
+    created_at: withRef.created_at,
+    brand: withRef.brand || 'none',
+    layout: withRef.layout,
+  });
+
+  return withRef;
 }

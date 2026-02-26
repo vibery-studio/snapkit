@@ -36,3 +36,23 @@ export function sanitizeUrlForCss(url: string | undefined): string {
   }
   return '';
 }
+
+// Map logo_position string to inline CSS position string (default: top-right)
+export function logoPositionStyle(pos: string | undefined): string {
+  const map: Record<string, string> = {
+    'top-left': 'top:5%;left:5%',
+    'top-right': 'top:5%;right:5%',
+    'bottom-left': 'bottom:5%;left:5%',
+    'bottom-right': 'bottom:5%;right:5%',
+  };
+  return map[pos || ''] || map['top-right'];
+}
+
+// Render watermark img overlay or empty string if no URL provided
+export function watermarkHtml(watermarkUrl: string | undefined, opacity: string | undefined): string {
+  if (!watermarkUrl) return '';
+  const safe = sanitizeUrlForCss(watermarkUrl);
+  if (!safe) return '';
+  const opacityValue = ({ light: '0.2', medium: '0.4', dark: '0.6' } as Record<string, string>)[opacity || 'light'] || '0.2';
+  return `<img src="${safe}" alt="" style="position:absolute;bottom:3%;right:3%;height:6%;max-width:20%;object-fit:contain;opacity:${opacityValue};pointer-events:none;z-index:10;" crossorigin="anonymous" onerror="this.style.display='none'" />`;
+}

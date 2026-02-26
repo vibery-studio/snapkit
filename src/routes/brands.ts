@@ -5,7 +5,7 @@
 import type { Env } from '../lib/types';
 import type { BrandKit } from '../lib/types';
 import { jsonResponse, notFoundResponse } from '../lib/response-helpers';
-import { r2GetJson } from '../lib/r2-helpers';
+import { r2GetJson, r2ListByPrefix } from '../lib/r2-helpers';
 import { BRANDS, BRAND_IDS } from '../data/brand-kits';
 
 // Try R2 first, fall back to hardcoded brand data
@@ -19,22 +19,43 @@ async function resolveBrand(id: string, env: Env): Promise<BrandKit | null> {
   return BRANDS[id] ?? null;
 }
 
-// GET /api/brands — list all brands (metadata only)
+// GET /api/brands — list all brands (hardcoded + R2-stored), R2 overrides hardcoded by same ID
 export async function handleBrandsList(_req: Request, env: Env): Promise<Response> {
-  const brands = BRAND_IDS.map(id => {
+  // Seed with hardcoded brands
+  const brandMap: Record<string, { id: string; name: string; slug: string; logo: string | null; colors: { primary: string; secondary: string } }> = {};
+  for (const id of BRAND_IDS) {
     const b = BRANDS[id];
-    return {
+    brandMap[id] = {
       id: b.id,
       name: b.name,
       slug: b.slug,
       logo: b.logos[0]?.url ?? null,
-      colors: {
-        primary: b.colors.primary,
-        secondary: b.colors.secondary,
-      },
+      colors: { primary: b.colors.primary, secondary: b.colors.secondary },
     };
-  });
-  return jsonResponse({ brands });
+  }
+
+  // Merge R2-stored brands (overrides hardcoded if same ID, adds new ones)
+  try {
+    const objects = await r2ListByPrefix(env, 'brands/', 200);
+    for (const obj of objects) {
+      const match = obj.key.match(/^brands\/([^/]+)\/kit\.json$/);
+      if (!match) continue;
+      const kitId = match[1];
+      const kit = await r2GetJson<BrandKit>(env, obj.key);
+      if (!kit) continue;
+      brandMap[kitId] = {
+        id: kit.id,
+        name: kit.name,
+        slug: kit.slug,
+        logo: kit.logos[0]?.url ?? null,
+        colors: { primary: kit.colors.primary, secondary: kit.colors.secondary },
+      };
+    }
+  } catch {
+    // R2 scan failed — use hardcoded only
+  }
+
+  return jsonResponse({ brands: Object.values(brandMap) });
 }
 
 // GET /api/brands/:id — full brand kit

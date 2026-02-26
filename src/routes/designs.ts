@@ -1,7 +1,7 @@
-// Route handlers for design CRUD: POST/GET/PUT /api/designs
+// Route handlers for design CRUD: POST/GET/PUT/fork /api/designs
 import type { Env } from '../lib/types';
 import { jsonResponse, errorResponse, notFoundResponse } from '../lib/response-helpers';
-import { saveDesign, getDesign, updateDesign } from '../lib/design-store';
+import { saveDesign, getDesign, updateDesign, forkDesign } from '../lib/design-store';
 import { getLayoutById } from '../layouts';
 import { getSizeById } from '../data/size-presets';
 
@@ -83,6 +83,23 @@ export async function handleDesignGet(designId: string, env: Env): Promise<Respo
   } catch (e) {
     console.error('Design get error:', e);
     return errorResponse('Failed to retrieve design', 500);
+  }
+}
+
+// POST /api/designs/:id/fork — create a copy of existing design, return new design info
+export async function handleDesignFork(designId: string, request: Request, env: Env): Promise<Response> {
+  try {
+    const forked = await forkDesign(designId, env);
+    if (!forked) return notFoundResponse('Source design not found');
+
+    const host = new URL(request.url).origin;
+    return jsonResponse(
+      { id: forked.id, url: `${host}/d/${forked.id}`, forked_from: forked.forked_from, created_at: forked.created_at },
+      201
+    );
+  } catch (e) {
+    console.error('Design fork error:', e);
+    return errorResponse('Failed to fork design', 500);
   }
 }
 

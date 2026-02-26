@@ -1,6 +1,6 @@
 // Renders a Design into a complete standalone HTML page for screenshot capture
 import type { Design, Env } from './types';
-import { getLayoutById } from '../layouts';
+import { resolveLayout } from '../layouts';
 import { getBrandById } from '../data/brand-kits';
 import { getSizeById } from '../data/size-presets';
 
@@ -27,8 +27,8 @@ function pageShell(thumbnailHtml: string): string {
 }
 
 // Render a saved design object into a full HTML page string
-export async function renderDesignToHTML(design: Design, _env: Env): Promise<string> {
-  const layout = getLayoutById(design.layout);
+export async function renderDesignToHTML(design: Design, env: Env): Promise<string> {
+  const layout = await resolveLayout(design.layout, env);
   if (!layout) throw new Error(`Unknown layout: ${design.layout}`);
 
   // Resolve dimensions from preset or design.size
@@ -66,13 +66,14 @@ export async function renderDesignToHTML(design: Design, _env: Env): Promise<str
   return pageShell(thumbnailHtml);
 }
 
-// Render from inline query params (no R2 lookup)
-export function renderInlineToHTML(
+// Render from inline query params — supports both built-in and custom R2 layouts
+export async function renderInlineToHTML(
   layoutId: string,
   sizeId: string,
-  params: Record<string, string>
-): string {
-  const layout = getLayoutById(layoutId);
+  params: Record<string, string>,
+  env: Env
+): Promise<string> {
+  const layout = await resolveLayout(layoutId, env);
   if (!layout) throw new Error(`Unknown layout: ${layoutId}`);
 
   const preset = getSizeById(sizeId);
