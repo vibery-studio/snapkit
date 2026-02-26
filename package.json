@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,6 +13,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260304.0",
+    "typescript": "^5.9.3",
     "wrangler": "^4.68.1"
   },
   "dependencies": {

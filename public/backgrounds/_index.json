@@ -1,0 +1,101 @@
+[
+  {
+    "url": "/backgrounds/abstract/geometric-dark.jpg",
+    "name": "Geometric Dark",
+    "category": "abstract",
+    "tags": ["abstract", "geometric", "dark", "pattern"]
+  },
+  {
+    "url": "/backgrounds/abstract/neon-grid.jpg",
+    "name": "Neon Grid",
+    "category": "abstract",
+    "tags": ["abstract", "neon", "grid", "tech"]
+  },
+  {
+    "url": "/backgrounds/abstract/waves-purple.jpg",
+    "name": "Purple Waves",
+    "category": "abstract",
+    "tags": ["abstract", "waves", "purple", "smooth"]
+  },
+  {
+    "url": "/backgrounds/nature/mountain-fog.jpg",
+    "name": "Mountain Fog",
+    "category": "nature",
+    "tags": ["nature", "mountain", "fog", "landscape"]
+  },
+  {
+    "url": "/backgrounds/nature/forest-light.jpg",
+    "name": "Forest Light",
+    "category": "nature",
+    "tags": ["nature", "forest", "green", "light"]
+  },
+  {
+    "url": "/backgrounds/nature/ocean-horizon.jpg",
+    "name": "Ocean Horizon",
+    "category": "nature",
+    "tags": ["nature", "ocean", "blue", "horizon"]
+  },
+  {
+    "url": "/backgrounds/business/office-dark.jpg",
+    "name": "Dark Office",
+    "category": "business",
+    "tags": ["business", "office", "professional", "dark"]
+  },
+  {
+    "url": "/backgrounds/business/conference-blur.jpg",
+    "name": "Conference Blur",
+    "category": "business",
+    "tags": ["business", "conference", "meeting", "blur"]
+  },
+  {
+    "url": "/backgrounds/texture/concrete-dark.jpg",
+    "name": "Dark Concrete",
+    "category": "texture",
+    "tags": ["texture", "concrete", "dark", "minimal"]
+  },
+  {
+    "url": "/backgrounds/texture/paper-cream.jpg",
+    "name": "Cream Paper",
+    "category": "texture",
+    "tags": ["texture", "paper", "cream", "warm"]
+  },
+  {
+    "url": "/backgrounds/texture/carbon-fiber.jpg",
+    "name": "Carbon Fiber",
+    "category": "texture",
+    "tags": ["texture", "carbon", "tech", "dark"]
+  },
+  {
+    "url": "/backgrounds/gradient/purple-deep.jpg",
+    "name": "Purple Deep",
+    "category": "gradient",
+    "tags": ["gradient", "purple", "deep", "smooth"]
+  },
+  {
+    "url": "/backgrounds/gradient/ocean-blue.jpg",
+    "name": "Ocean Blue",
+    "category": "gradient",
+    "tags": ["gradient", "blue", "ocean", "cool"]
+  },
+  {
+    "url": "/backgrounds/brand/goha/brand-dark.jpg",
+    "name": "GOHA Dark",
+    "category": "abstract",
+    "tags": ["brand", "dark", "professional"],
+    "brand": "goha"
+  },
+  {
+    "url": "/backgrounds/brand/goha/brand-accent.jpg",
+    "name": "GOHA Accent",
+    "category": "abstract",
+    "tags": ["brand", "accent", "gold"],
+    "brand": "goha"
+  },
+  {
+    "url": "/backgrounds/brand/vibery/brand-purple.jpg",
+    "name": "Vibery Purple",
+    "category": "abstract",
+    "tags": ["brand", "purple", "vibrant"],
+    "brand": "vibery"
+  }
+]
