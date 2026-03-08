@@ -87,6 +87,9 @@ worktrees/
 .wrangler/
 api/.wrangler/
 
+# Absolute path artifacts (from worktrees)
+Applications/
+
 # AI coding tools
 .claude/
 .opencode/
