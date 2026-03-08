@@ -70,6 +70,20 @@ This ensures packages installed by `install.sh` (google-genai, pypdf, etc.) are 
 - After modularization, continue with main task
 - When not to modularize: Markdown files, plain text files, bash scripts, configuration files, environment variables files, etc.
 
+## SnapKit Architecture Concepts
+
+### Template vs Layout
+- **Layout** = HTML render function with placeholders (title, subtitle, bg_image, feature_image, logo)
+- **Template** = Layout + Default Size + Default Brand Assets (logo, bg, feature_image)
+
+Templates provide quick-start presets so users can immediately generate thumbnails with one click. Layouts are the building blocks; Templates are the ready-to-use configurations.
+
+### Key Entities
+- `SizePreset` - dimensions (w×h) with category
+- `Layout` - render function + params + categories + optional defaultSize
+- `BrandKit` - colors, fonts, logos[], backgrounds[], watermark
+- `Design` - saved configuration (layout + size + brand + params)
+
 ## Documentation Management
 
 We keep all important docs in `./docs` folder and keep updating them, structure like below:

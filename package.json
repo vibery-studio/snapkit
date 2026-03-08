@@ -1,23 +1,15 @@
 {
   "name": "snapkit",
-  "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "workspaces": ["api", "app"],
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "typecheck": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w app\"",
+    "dev:api": "npm run dev -w api",
+    "build": "npm run build -w app && npm run deploy -w api",
+    "dev:app": "npm run dev -w app",
+    "typecheck": "npm run typecheck -w api && npm run typecheck -w app"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260304.0",
-    "typescript": "^5.9.3",
-    "wrangler": "^4.68.1"
-  },
-  "dependencies": {
-    "@zumer/snapdom": "^2.0.2"
+    "concurrently": "^9.0.0"
   }
 }

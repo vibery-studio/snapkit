@@ -1,0 +1,41 @@
+/* Morning Pages design tokens */
+:root {
+  /* Colors */
+  --mp-bg: #FEFCF8;
+  --mp-bg2: #F7F3EB;
+  --mp-bg3: #EEE9DF;
+  --mp-ink: #1A1612;
+  --mp-muted: rgba(26, 22, 18, 0.50);
+  --mp-light: rgba(26, 22, 18, 0.24);
+  --mp-rule: rgba(26, 22, 18, 0.08);
+  --mp-terra: #C05A30;
+  --mp-terra2: #A04820;
+  --mp-sage: #5A7A60;
+  --mp-sand: #C8A882;
+
+  /* Typography */
+  --mp-font-heading: 'Lora', Georgia, serif;
+  --mp-font-body: 'Plus Jakarta Sans', sans-serif;
+  --mp-font-mono: 'DM Mono', monospace;
+
+  /* Layout */
+  --mp-gutter: 88px;
+  --mp-max-width: 1280px;
+  --mp-radius: 8px;
+  --mp-radius-lg: 12px;
+  --mp-radius-sm: 4px;
+
+  /* Spacing (4px base) */
+  --mp-s1: 4px;
+  --mp-s2: 8px;
+  --mp-s3: 12px;
+  --mp-s4: 16px;
+  --mp-s5: 20px;
+  --mp-s6: 24px;
+  --mp-s7: 32px;
+  --mp-s8: 40px;
+
+  /* Shadows */
+  --mp-shadow-sm: 0 1px 2px rgba(26, 22, 18, 0.06);
+  --mp-shadow-md: 0 4px 12px rgba(26, 22, 18, 0.08);
+}

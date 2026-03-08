@@ -1,0 +1,38 @@
+name = "snapkit"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+account_id = "5cbaf7492795d0e9eafa26240b14389c"
+
+routes = [
+  { pattern = "snapkit.vibery.app", custom_domain = true }
+]
+
+[dev]
+port = 8787
+
+[assets]
+directory = "./public"
+
+# R2 bucket for binary assets (images, logos, backgrounds)
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "snapkit-storage"
+
+# D1 database for structured data (designs, brands, layouts, templates)
+[[d1_databases]]
+binding = "DB"
+database_name = "snapkit-db"
+database_id = "598818b8-ae10-453b-966e-bcabfd753332"
+
+# Workers AI for smart image search
+[ai]
+binding = "AI"
+
+# Environment variables (set via wrangler secret)
+# UNSPLASH_ACCESS_KEY - for image search (Unsplash)
+# PEXELS_API_KEY - for image search (Pexels)
+# WINDMILL_BASE - for server-side generation
+# WINDMILL_TOKEN - for server-side generation
+
+[vars]
+PEXELS_API_KEY = "4WbBG7xLjTBU5ACfqviL9ZvAwrawBikAaPA52ynDLeWF2e0r9CCctNp1"
