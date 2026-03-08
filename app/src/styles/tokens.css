@@ -1,9 +1,9 @@
 /* Morning Pages design tokens */
 :root {
   /* Colors */
-  --mp-bg: #FEFCF8;
-  --mp-bg2: #F7F3EB;
-  --mp-bg3: #EEE9DF;
+  --mp-bg: #FAFAFA;
+  --mp-bg2: #F3F3F3;
+  --mp-bg3: #E8E8E8;
   --mp-ink: #1A1612;
   --mp-muted: rgba(26, 22, 18, 0.50);
   --mp-light: rgba(26, 22, 18, 0.24);

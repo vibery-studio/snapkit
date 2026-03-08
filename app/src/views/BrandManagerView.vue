@@ -9,6 +9,8 @@ import FileUpload from '../components/FileUpload.vue'
 import MpButton from '../components/ui/MpButton.vue'
 import MpInput from '../components/ui/MpInput.vue'
 import MpCard from '../components/ui/MpCard.vue'
+import MpSearchSelect from '../components/ui/MpSearchSelect.vue'
+import { FONT_OPTIONS } from '../data/google-fonts'
 
 const route = useRoute()
 const router = useRouter()
@@ -224,8 +226,8 @@ onMounted(async () => {
 
           <h3 class="brand-mgr__section-title">Fonts</h3>
           <div class="brand-mgr__form-grid">
-            <MpInput label="Heading font" :modelValue="editFonts.heading" @update:modelValue="editFonts.heading = $event" placeholder="e.g. Playfair Display" />
-            <MpInput label="Body font" :modelValue="editFonts.body" @update:modelValue="editFonts.body = $event" placeholder="e.g. Inter" />
+            <MpSearchSelect label="Heading font" :modelValue="editFonts.heading" @update:modelValue="editFonts.heading = $event" :options="FONT_OPTIONS" placeholder="Select heading font" />
+            <MpSearchSelect label="Body font" :modelValue="editFonts.body" @update:modelValue="editFonts.body = $event" :options="FONT_OPTIONS" placeholder="Select body font" />
           </div>
 
           <div class="brand-mgr__save-row">
@@ -455,11 +457,12 @@ onMounted(async () => {
   width: 36px;
   height: 36px;
   padding: 2px;
-  border: 1px solid var(--mp-rule);
+  border: 2px solid var(--mp-ink);
   border-radius: var(--mp-radius-sm, 4px);
   background: none;
   cursor: pointer;
   flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--mp-bg);
 }
 
 .brand-mgr__save-row {

@@ -45,7 +45,7 @@ defineEmits<{
 
 .mp-input {
   background: var(--mp-bg2);
-  border: 1px solid transparent;
+  border: 1px solid var(--mp-rule);
   border-radius: var(--mp-radius);
   padding: 10px 14px;
   font-family: var(--mp-font-body);

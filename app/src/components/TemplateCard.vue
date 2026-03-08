@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Template } from '../stores/templates'
 import MpBadge from './ui/MpBadge.vue'
 import MpButton from './ui/MpButton.vue'
 
-defineProps<{
+const props = defineProps<{
   template: Template
 }>()
 
@@ -11,6 +12,22 @@ const emit = defineEmits<{
   edit: []
   delete: []
 }>()
+
+// Calculate scale to fit thumbnail in preview container (like object-fit: contain)
+const iframeStyle = computed(() => {
+  const tw = props.template.dimensions?.width || 1280
+  const th = props.template.dimensions?.height || 720
+  // Preview container is ~400px wide, 16:9 aspect = 225px tall
+  const containerW = 400
+  const containerH = 225
+  const scale = Math.min(containerW / tw, containerH / th)
+  return {
+    width: `${tw}px`,
+    height: `${th}px`,
+    transform: `scale(${scale})`,
+    transformOrigin: 'top left',
+  }
+})
 </script>
 
 <template>
@@ -21,6 +38,7 @@ const emit = defineEmits<{
         :src="`/api/render?t=${template.id}`"
         :title="template.name"
         class="template-card__iframe"
+        :style="iframeStyle"
       />
     </div>
 
@@ -62,17 +80,14 @@ const emit = defineEmits<{
   aspect-ratio: 16 / 9;
   background: var(--mp-bg3);
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
 }
 
 .template-card__iframe {
-  width: 200%;
-  height: 200%;
+  position: absolute;
+  top: 0;
+  left: 0;
   border: none;
-  transform: scale(0.5);
-  transform-origin: top left;
   pointer-events: none;
 }
 
