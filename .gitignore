@@ -86,3 +86,7 @@ external/
 worktrees/
 .wrangler/
 api/.wrangler/
+
+# AI coding tools
+.claude/
+.opencode/
