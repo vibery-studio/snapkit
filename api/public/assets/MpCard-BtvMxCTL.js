@@ -1,1 +1,0 @@
-import{a as s,b as o,p as d,u as r,o as p,_ as n}from"./index-C97VxNba.js";const t=s({__name:"MpCard",props:{padding:{}},setup(a){return(e,c)=>(p(),o("div",{class:d(["mp-card",`mp-card--${a.padding??"md"}`])},[r(e.$slots,"default",{},void 0)],2))}}),_=n(t,[["__scopeId","data-v-e0ed4618"]]);export{_ as M};

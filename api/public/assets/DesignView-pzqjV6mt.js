@@ -1,0 +1,1 @@
+import{a as n,b as o,e as s,t as a,x as i,y as r,o as _,_ as c}from"./index-Cj_L8OYP.js";const p={class:"design-view"},d=n({__name:"DesignView",setup(u){const t=r().params.id;return(m,e)=>(_(),o("div",p,[e[0]||(e[0]=s("h1",null,"Design",-1)),s("p",null,"Design ID: "+a(i(t)),1)]))}}),g=c(d,[["__scopeId","data-v-e90da111"]]);export{g as default};
