@@ -10,7 +10,7 @@ RUN npm run build
 FROM golang:latest AS backend
 WORKDIR /build
 COPY server/ ./
-RUN go mod download && go build -o snapkit .
+RUN CGO_ENABLED=0 go mod download && CGO_ENABLED=0 go build -o snapkit .
 
 # Stage 3: Production
 FROM alpine:3.20
