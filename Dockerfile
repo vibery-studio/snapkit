@@ -7,7 +7,7 @@ COPY app/ ./
 RUN npm run build
 
 # Stage 2: Build Go server
-FROM golang:1.23-alpine AS backend
+FROM golang:latest AS backend
 WORKDIR /build
 COPY server/ ./
 RUN go mod download && go build -o snapkit .
