@@ -17,23 +17,18 @@ const brandStore = useBrandsStore()
 const layouts = ref<Layout[]>([])
 const sizes = ref<SizePreset[]>([])
 
-interface SizeApiResponse {
-  sizes: Array<{ id: string; name: string; width: number; height: number; category: string }>
-}
-
 async function fetchMeta() {
   try {
-    const [l, sRes] = await Promise.all([
+    const [l, sData] = await Promise.all([
       apiFetch<Layout[]>('/api/layouts'),
-      apiFetch<SizeApiResponse>('/api/sizes'),
+      apiFetch<Array<{ id: string; name: string; w: number; h: number; category: string }>>('/api/sizes'),
     ])
     layouts.value = l
-    // Map API response (width/height) to client type (w/h)
-    sizes.value = sRes.sizes.map(s => ({
+    sizes.value = sData.map(s => ({
       id: s.id,
       name: s.name,
-      w: s.width,
-      h: s.height,
+      w: s.w,
+      h: s.h,
       category: s.category as SizePreset['category'],
     }))
   } catch {

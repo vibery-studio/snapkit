@@ -24,6 +24,10 @@ const router = createRouter({
       component: () => import('./views/LayoutManagerView.vue'),
     },
     {
+      path: '/bulk',
+      component: () => import('./views/BulkCreateView.vue'),
+    },
+    {
       path: '/d/:id',
       component: () => import('./views/DesignView.vue'),
     },

@@ -18,6 +18,7 @@ import { LAYOUTS } from './layouts';
 import { handleLayoutCreate, handleLayoutUpdate, handleLayoutDelete, handleLayoutGet, listCustomLayouts } from './routes/layout-crud';
 import { handleAssetUpload } from './routes/asset-upload';
 import { handleMediaList, handleMediaGet, handleMediaCreate, handleMediaDelete } from './routes/media';
+import { handleScreenshot } from './routes/screenshot';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -179,6 +180,11 @@ export default {
       return handleRender(url, env);
     }
 
+    // GET /api/screenshot — capture template as PNG via TonyAPI
+    if (path === '/api/screenshot' && method === 'GET') {
+      return handleScreenshot(url, env);
+    }
+
     // POST /api/generate — server-side PNG generation
     if (path === '/api/generate' && method === 'POST') {
       return handleGenerate(request, env);
@@ -253,7 +259,7 @@ export default {
       return new Response(obj.body, { headers });
     }
 
-    // Let wrangler handle static assets (fonts, logos, etc.)
-    return notFoundResponse();
+    // SPA fallback: let ASSETS binding handle it (serves index.html for unknown routes)
+    return env.ASSETS.fetch(request);
   },
 };

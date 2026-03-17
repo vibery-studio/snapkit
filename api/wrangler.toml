@@ -12,6 +12,9 @@ port = 8787
 
 [assets]
 directory = "./public"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "single-page-application"
 
 # R2 bucket for binary assets (images, logos, backgrounds)
 [[r2_buckets]]
@@ -35,4 +38,4 @@ binding = "AI"
 # WINDMILL_TOKEN - for server-side generation
 
 [vars]
-PEXELS_API_KEY = "4WbBG7xLjTBU5ACfqviL9ZvAwrawBikAaPA52ynDLeWF2e0r9CCctNp1"
+# API keys moved to .dev.vars (not committed)

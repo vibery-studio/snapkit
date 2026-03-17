@@ -93,3 +93,6 @@ Applications/
 # AI coding tools
 .claude/
 .opencode/
+server/snapkit
+data/
+.figma-use.json

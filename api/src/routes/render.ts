@@ -57,13 +57,16 @@ export async function handleRender(url: URL, env: Env): Promise<Response> {
       };
 
       // Merge template params with query overrides (title, subtitle, etc.)
-      const params: Record<string, string> = { ...template.params };
+      // Include brand from template so logo/colors can be resolved
+      const params: Record<string, string> = { ...template.params, brand: template.brand };
+      const titleOverridden = url.searchParams.has('title');
+      const featureImageOverridden = url.searchParams.has('feature_image');
       url.searchParams.forEach((value, key) => {
         if (key !== 't') params[key] = value;
       });
 
-      // Auto-search feature_image if enabled and not provided
-      if (template.auto_feature_image && !params.feature_image && params.title && env.PEXELS_API_KEY) {
+      // Auto-search feature_image if enabled and title was overridden (but not feature_image)
+      if (template.auto_feature_image && titleOverridden && !featureImageOverridden && params.title && env.PEXELS_API_KEY) {
         const { generateSearchQuery, getColorMood } = await import('../lib/ai-search-query');
         const { searchPexels } = await import('../lib/pexels');
         const brandMood = getColorMood(params.bg_color || '#1a1a3e');

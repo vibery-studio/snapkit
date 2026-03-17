@@ -22,8 +22,7 @@ export const useTemplatesStore = defineStore('templates', () => {
     loading.value = true
     error.value = null
     try {
-      const res = await apiFetch<{ templates: Template[] }>('/api/templates')
-      templates.value = res.templates
+      templates.value = await apiFetch<Template[]>('/api/templates')
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load templates'
     } finally {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, watchEffect } from 'vue'
 import { useBuilderStore } from '../stores/builder'
 import { useBrands } from '../composables/use-brands'
 import { useLayouts } from '../composables/use-layouts'
@@ -12,7 +12,7 @@ import MpInput from '../components/ui/MpInput.vue'
 import LayoutRenderer from '../components/LayoutRenderer.vue'
 import BackgroundPicker from '../components/BackgroundPicker.vue'
 import LogoPicker from '../components/LogoPicker.vue'
-import FeatureImagePicker from '../components/FeatureImagePicker.vue'
+import ImagePicker from '../components/ImagePicker.vue'
 
 interface Template {
   id: string
@@ -29,9 +29,16 @@ const { layouts, fetchLayouts } = useLayouts()
 const { sizes, fetchSizes } = useSizes()
 
 const templates = ref<Template[]>([])
-const selectedBrandId = ref('')
-const selectedTemplateId = ref('')
+// Restore from localStorage
+const saved = JSON.parse(localStorage.getItem('snapkit-builder') || '{}')
+const selectedBrandId = ref(saved.brandId || '')
+const selectedTemplateId = ref(saved.templateId || '')
 const brandDetail = ref<BrandKit | null>(null)
+
+// Persist selections to localStorage
+watch([selectedBrandId, selectedTemplateId], ([brandId, templateId]) => {
+  localStorage.setItem('snapkit-builder', JSON.stringify({ brandId, templateId }))
+})
 
 // Filtered templates for selected brand
 const brandTemplates = computed(() =>
@@ -50,70 +57,108 @@ const previewScale = computed(() => {
 
 // Shorthand helpers for params bound to store
 function p(key: string) {
-  const val = (store.params[key] as string) ?? ''
-  if (key === 'featureImage') {
-    console.log('p(featureImage) returning:', val ? val.substring(0, 100) + '...' : '(empty)')
-  }
-  return val
+  return (store.params[key] as string) ?? ''
 }
 function sp(key: string, val: string) {
-  console.log('sp called:', key, '=', typeof val === 'string' && val ? val.substring(0, 100) + '...' : '(empty or non-string)')
   store.setParam(key, val)
-  console.log('store.params.featureImage after:', store.params.featureImage ? 'SET (length: ' + String(store.params.featureImage).length + ')' : 'NOT SET')
 }
+
+// Build render URL (for fullscreen/export)
+function buildRenderUrl(): string {
+  if (!store.selectedLayout || !store.selectedSize) return ''
+  const params = new URLSearchParams()
+  if (selectedTemplateId.value) {
+    params.set('t', selectedTemplateId.value)
+  } else {
+    params.set('layout', store.selectedLayout.id)
+    params.set('size', store.selectedSize.id)
+  }
+  for (const [k, v] of Object.entries(store.params)) {
+    if (v) params.set(k.replace(/([A-Z])/g, '_$1').toLowerCase(), String(v))
+  }
+  return `/api/render?${params.toString()}`
+}
+
+// Inline HTML preview — fetches thumbnail HTML from server, debounced
+const previewHtml = ref('')
+let previewDebounce: ReturnType<typeof setTimeout> | null = null
+
+watchEffect(() => {
+  // Build URL for /render/html (inline, no page shell)
+  if (!store.selectedLayout || !store.selectedSize) { previewHtml.value = ''; return }
+  const params = new URLSearchParams()
+  if (selectedTemplateId.value) {
+    params.set('t', selectedTemplateId.value)
+  } else {
+    params.set('layout', store.selectedLayout.id)
+    params.set('size', store.selectedSize.id)
+  }
+  for (const [k, v] of Object.entries(store.params)) {
+    if (v) params.set(k.replace(/([A-Z])/g, '_$1').toLowerCase(), String(v))
+  }
+  const url = `/api/render/html?${params.toString()}`
+
+  if (previewDebounce) clearTimeout(previewDebounce)
+  previewDebounce = setTimeout(async () => {
+    try {
+      const res = await fetch(url)
+      if (res.ok) previewHtml.value = await res.text()
+    } catch { /* ignore */ }
+  }, 300)
+})
 
 onMounted(async () => {
   await Promise.all([fetchBrands(), fetchLayouts(), fetchSizes()])
-  const data = await apiFetch<{ templates: Template[] }>('/api/templates')
-  templates.value = data.templates
-  if (brands.value.length) selectedBrandId.value = brands.value[0]!.id
+  const data = await apiFetch<Template[]>('/api/templates')
+  templates.value = data
+  // Use saved brand or default to first
+  if (!selectedBrandId.value && brands.value.length) selectedBrandId.value = brands.value[0]!.id
+  // Re-apply saved template after data is loaded
+  if (selectedTemplateId.value) {
+    applyTemplate(selectedTemplateId.value)
+  }
 })
 
 // Track if we should skip brand defaults (when template is being applied)
-const skipBrandDefaults = ref(false)
 
-// Load brand detail when brand changes
+// Load brand detail when brand changes — full reset
 watch(selectedBrandId, async (id) => {
   if (!id) { brandDetail.value = null; return }
+  selectedTemplateId.value = ''
   try {
     brandDetail.value = await apiFetch<BrandKit>(`/api/brands/${id}`)
     if (brandDetail.value) {
       store.setBrand(brandDetail.value)
-      // Only apply brand defaults if no template selected
-      if (!skipBrandDefaults.value) {
-        const b = brandDetail.value
-        sp('bgColor', b.colors.primary)
-        sp('titleColor', b.colors.secondary)
-        sp('subtitleColor', b.default_text_color || '#FFFFFF')
-        sp('overlay', b.default_overlay || 'dark')
-        if (b.logos[0]) sp('logo', b.logos[0].url)
-        if (b.backgrounds[0]) sp('bgImage', b.backgrounds[0].url)
-      }
-      skipBrandDefaults.value = false
+      // Reset all params to brand defaults
+      store.resetParams()
+      const b = brandDetail.value
+      sp('bgColor', b.colors.primary)
+      sp('titleColor', b.colors.secondary)
+      sp('subtitleColor', b.default_text_color || '#FFFFFF')
+      sp('overlay', b.default_overlay || 'dark')
+      sp('logo', b.logos[0]?.url || '')
+      sp('bgImage', b.backgrounds[0]?.url || '')
     }
   } catch { brandDetail.value = null }
 })
 
-// Apply template preset - sets layout with preserveParams, then applies template params
-watch(selectedTemplateId, (tplId) => {
+// Apply a template's settings to the builder
+function applyTemplate(tplId: string) {
   if (!tplId) return
   const tpl = templates.value.find(t => t.id === tplId)
   if (!tpl) return
 
-  // Flag to skip brand defaults since template will override
-  skipBrandDefaults.value = true
-
   const size = sizes.value.find(s => s.id === tpl.size)
   if (size) store.setSize(size)
   const layout = layouts.value.find(l => l.id === tpl.layout)
-  if (layout) store.setLayout(layout, true) // preserve params
-  // Apply ALL template params (overrides brand defaults)
-  // Convert snake_case to camelCase for Builder compatibility
+  if (layout) store.setLayout(layout, true)
   for (const [k, v] of Object.entries(tpl.params)) {
     const key = k.replace(/_([a-z])/g, (_, c) => c.toUpperCase())
     store.setParam(key, v)
   }
-})
+}
+
+watch(selectedTemplateId, applyTemplate)
 
 function setLayout(id: string) {
   const l = layouts.value.find(l => l.id === id)
@@ -131,30 +176,16 @@ const isExporting = ref(false)
 
 // Open render in new tab for fullscreen preview/screenshot
 function openFullscreen() {
-  const params = new URLSearchParams()
-
-  // Use template endpoint if template selected, else inline params
-  if (selectedTemplateId.value) {
-    params.set('t', selectedTemplateId.value)
-  } else {
-    if (!store.selectedLayout || !store.selectedSize) return
-    params.set('layout', store.selectedLayout.id)
-    params.set('size', store.selectedSize.id)
-  }
-
-  // Add current param overrides (camelCase → snake_case)
-  for (const [k, v] of Object.entries(store.params)) {
-    if (v) params.set(k.replace(/([A-Z])/g, '_$1').toLowerCase(), String(v))
-  }
-  window.open(`/api/render?${params.toString()}`, '_blank')
+  const url = buildRenderUrl()
+  if (url) window.open(url, '_blank')
 }
 
 async function exportPng() {
   if (!store.selectedLayout || !store.selectedSize || isExporting.value) return
 
-  // Find the actual thumbnail element inside the layout renderer
+  // Find the #thumbnail element rendered via v-html
   const wrapper = layoutRendererRef.value
-  const thumb = wrapper?.querySelector('.layout-renderer') as HTMLElement
+  const thumb = wrapper?.querySelector('#thumbnail') as HTMLElement
   if (!thumb) {
     alert('No element to export')
     return
@@ -162,22 +193,25 @@ async function exportPng() {
 
   isExporting.value = true
   try {
-    // Wait for fonts
+    // Wait for fonts + images (same pattern as vilab share-image)
     await document.fonts.ready
+    const imgs = thumb.querySelectorAll('img')
+    await Promise.all(Array.from(imgs).map(img => {
+      if (img.complete) return Promise.resolve()
+      return new Promise(r => { img.onload = r; img.onerror = r; setTimeout(r, 5000) })
+    }))
 
-    // Save and remove scale transform for clean capture
-    const origT = thumb.style.transform
-    const origO = thumb.style.transformOrigin
-    thumb.style.transform = 'none'
-    thumb.style.transformOrigin = ''
+    // Remove scale transform from wrapper for clean capture
+    const origT = wrapper!.style.transform
+    wrapper!.style.transform = 'none'
 
-    // Capture with snapdom
-    const result = await snapdom(thumb)
-    const blob = await result.toBlob({ type: 'image/png', scale: 2 })
+    // Capture with snapdom at native resolution
+    const result = await snapdom(thumb, { scale: 1 })
+    const canvas = await result.toCanvas()
+    const blob = await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b!), 'image/png'))
 
     // Restore transform
-    thumb.style.transform = origT
-    thumb.style.transformOrigin = origO
+    wrapper!.style.transform = origT
 
     // Download
     const url = URL.createObjectURL(blob)
@@ -224,8 +258,8 @@ async function saveTemplate() {
     }),
   })
   // Refresh templates
-  const data = await apiFetch<{ templates: Template[] }>('/api/templates')
-  templates.value = data.templates
+  const data = await apiFetch<Template[]>('/api/templates')
+  templates.value = data
 }
 
 function exportMultiple() {
@@ -260,6 +294,16 @@ function goDesignTemplate() {
         </select>
       </div>
 
+      <!-- Quick Start Template -->
+      <div class="builder__section">
+        <label class="builder__label">Quick Start Template</label>
+        <select v-model="selectedTemplateId" class="builder__select">
+          <option value="">-- Select Template --</option>
+          <option v-for="t in brandTemplates" :key="t.id" :value="t.id">{{ t.name }}</option>
+        </select>
+        <p v-if="selectedBrandId && !brandTemplates.length" class="builder__hint">No templates yet</p>
+      </div>
+
       <!-- Size preset -->
       <div class="builder__section">
         <label class="builder__label">Size Preset</label>
@@ -273,16 +317,6 @@ function goDesignTemplate() {
             {{ s.name }} ({{ s.w }}×{{ s.h }})
           </option>
         </select>
-      </div>
-
-      <!-- Quick Start Template -->
-      <div class="builder__section">
-        <label class="builder__label">Quick Start Template</label>
-        <select v-model="selectedTemplateId" class="builder__select">
-          <option value="">-- Select Template --</option>
-          <option v-for="t in brandTemplates" :key="t.id" :value="t.id">{{ t.name }}</option>
-        </select>
-        <p v-if="selectedBrandId && !brandTemplates.length" class="builder__hint">No templates yet</p>
       </div>
 
       <!-- Layout -->
@@ -314,24 +348,14 @@ function goDesignTemplate() {
             height: store.selectedSize ? `${store.selectedSize.h * previewScale}px` : '360px',
           }"
         >
-          <div v-if="store.selectedLayout && store.selectedSize" ref="layoutRendererRef">
-            <LayoutRenderer
-              :layoutId="store.selectedLayout.id"
-              :width="store.selectedSize.w"
-              :height="store.selectedSize.h"
-              :scale="previewScale"
-              :title="p('title')"
-              :subtitle="p('subtitle')"
-              :bgImage="p('bgImage')"
-              :bgColor="p('bgColor')"
-              :titleColor="p('titleColor')"
-              :subtitleColor="p('subtitleColor')"
-              :logo="p('logo')"
-              :logoPosition="(p('logoPosition') || 'bottom-right') as any"
-              :featureImage="p('featureImage')"
-              :overlay="(p('overlay') || 'none') as any"
-            />
-          </div>
+          <div v-if="previewHtml" ref="layoutRendererRef"
+            :style="{
+              transform: `scale(${previewScale})`,
+              transformOrigin: 'top left',
+              flexShrink: 0,
+            }"
+            v-html="previewHtml"
+          />
           <div v-else class="builder__preview-placeholder">
             <span>Select layout &amp; size to preview</span>
           </div>
@@ -437,8 +461,8 @@ function goDesignTemplate() {
 
       <!-- Feature Image -->
       <div class="builder__section">
-        <label class="builder__label">Feature Image</label>
-        <FeatureImagePicker
+        <ImagePicker
+          label="Feature Image"
           :modelValue="p('featureImage')"
           @update:modelValue="sp('featureImage', $event)"
         />

@@ -6,11 +6,10 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:8787',
-      '/r2': 'http://localhost:8787',
-      '/uploads': 'http://localhost:8787',
-      '/brands': 'http://localhost:8787',
-      '/backgrounds': 'http://localhost:8787',
+      '/api': 'http://localhost:8080',
+      '/uploads': 'http://localhost:8080',
+      '/brands': 'http://localhost:8080',
+      '/fonts': 'http://localhost:8080',
     }
   }
 })

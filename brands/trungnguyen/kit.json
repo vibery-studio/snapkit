@@ -1,0 +1,24 @@
+{
+  "id": "trungnguyen",
+  "name": "Trung Nguyên",
+  "slug": "trungnguyen",
+  "colors": {
+    "primary": "#a40000",
+    "secondary": "#ec5500",
+    "accent": "#fc7400",
+    "text_light": "#FFFFFF",
+    "text_dark": "#a40000"
+  },
+  "fonts": {
+    "heading": "Montserrat",
+    "body": "Be Vietnam Pro"
+  },
+  "logos": [
+    { "id": "main", "url": "/brands/trungnguyen/logos/logo.png", "name": "Trung Nguyên Logo" }
+  ],
+  "backgrounds": [
+    { "url": "/brands/trungnguyen/bg/template-thumbnail-2.png", "tags": ["industrial", "machinery"], "name": "Template Thumbnail" }
+  ],
+  "default_text_color": "#FFFFFF",
+  "default_overlay": "dark"
+}

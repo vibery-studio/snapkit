@@ -28,6 +28,10 @@ export const useBuilderStore = defineStore('builder', () => {
     params.value = { ...params.value, [key]: value }
   }
 
+  function resetParams() {
+    params.value = {}
+  }
+
   function reset() {
     selectedSize.value = null
     selectedLayout.value = null
@@ -35,5 +39,5 @@ export const useBuilderStore = defineStore('builder', () => {
     params.value = {}
   }
 
-  return { selectedSize, selectedLayout, selectedBrand, params, setSize, setLayout, setBrand, setParam, reset }
+  return { selectedSize, selectedLayout, selectedBrand, params, setSize, setLayout, setBrand, setParam, resetParams, reset }
 })

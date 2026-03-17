@@ -8,6 +8,7 @@ const navItems = [
   { path: '/', icon: 'builder', label: 'Builder' },
   { path: '/manage/brands', icon: 'brands', label: 'Brands' },
   { path: '/manage/templates', icon: 'templates', label: 'Templates' },
+  { path: '/bulk', icon: 'bulk', label: 'Bulk' },
 ]
 
 function isActive(path: string) {

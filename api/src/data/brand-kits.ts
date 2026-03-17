@@ -76,6 +76,32 @@ export const BRANDS: Record<string, BrandKit> = {
     default_text_color: '#FFFFFF',
     default_overlay: 'dark',
   },
+  trungnguyen: {
+    id: 'trungnguyen',
+    name: 'Trung Nguyên',
+    slug: 'trungnguyen',
+    colors: {
+      primary: '#a40000',
+      secondary: '#ec5500',
+      accent: '#fc7400',
+      text_light: '#FFFFFF',
+      text_dark: '#a40000',
+    },
+    fonts: { heading: 'TikTok Sans', body: 'TikTok Sans' },
+    logos: [
+      { id: 'white', url: '/brands/trungnguyen/logos/Logo_Original.png', name: 'Logo White (for dark bg)' },
+      { id: 'main', url: '/brands/trungnguyen/logos/logo.png', name: 'Logo Dark (for light bg)' },
+      { id: 'white-alt', url: '/brands/trungnguyen/logos/logo-white.png', name: 'Logo White Alt' },
+      { id: 'fallback', url: svgLogo('TN', '#a40000', '#FFFFFF'), name: 'TN SVG' },
+    ],
+    backgrounds: [
+      { url: '/brands/trungnguyen/bg/template-thumbnail-2.png', tags: ['industrial', 'machinery'], name: 'Template Thumbnail' },
+      { url: '/brands/trungnguyen/frame_left.png', tags: ['frame', 'overlay'], name: 'Frame Left Overlay' },
+    ],
+    watermark: undefined,
+    default_text_color: '#FFFFFF',
+    default_overlay: 'dark',
+  },
 };
 
 export const BRAND_IDS = Object.keys(BRANDS);

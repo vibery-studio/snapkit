@@ -9,6 +9,7 @@ import { textOnlyLayout } from './text-only';
 import { collage2Layout } from './collage-2';
 import { frameLayout } from './frame';
 import { agencySplitLayout } from './agency-split';
+import { brandShowcaseLayout } from './brand-showcase';
 import { CUSTOM_LAYOUTS } from '../data/custom-layouts';
 
 // Built-in layouts
@@ -22,6 +23,7 @@ const BUILTIN_LAYOUTS: Record<string, Layout> = {
   'collage-2': collage2Layout,
   'frame': frameLayout,
   'agency-split': agencySplitLayout,
+  'brand-showcase': brandShowcaseLayout,
 };
 
 // Merge built-in + custom layouts

@@ -12,8 +12,8 @@ export function useSizes() {
     loading.value = true
     error.value = null
     try {
-      const data = await apiFetch<{ sizes: Array<{ id: string; name: string; width: number; height: number; category: SizePreset['category'] }> }>('/api/sizes')
-      sizes.value = data.sizes.map(s => ({ id: s.id, name: s.name, w: s.width, h: s.height, category: s.category }))
+      const data = await apiFetch<Array<{ id: string; name: string; w: number; h: number; category: SizePreset['category'] }>>('/api/sizes')
+      sizes.value = data.map(s => ({ id: s.id, name: s.name, w: s.w, h: s.h, category: s.category }))
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load sizes'
     } finally {

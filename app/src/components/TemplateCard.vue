@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import type { Template } from '../stores/templates'
 import MpBadge from './ui/MpBadge.vue'
 import MpButton from './ui/MpButton.vue'
@@ -13,33 +13,36 @@ const emit = defineEmits<{
   delete: []
 }>()
 
-// Calculate scale to fit thumbnail in preview container (like object-fit: contain)
-const iframeStyle = computed(() => {
-  const tw = props.template.dimensions?.width || 1280
-  const th = props.template.dimensions?.height || 720
-  // Preview container is ~400px wide, 16:9 aspect = 225px tall
-  const containerW = 400
-  const containerH = 225
-  const scale = Math.min(containerW / tw, containerH / th)
-  return {
-    width: `${tw}px`,
-    height: `${th}px`,
-    transform: `scale(${scale})`,
-    transformOrigin: 'top left',
+const coverUrl = ref<string | null>(null)
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`/api/screenshot?t=${props.template.id}`)
+    if (res.ok) {
+      const data = await res.json()
+      coverUrl.value = data.url
+    }
+  } catch {
+    // fallback: no cover image
+  } finally {
+    loading.value = false
   }
 })
 </script>
 
 <template>
   <div class="template-card">
-    <!-- Preview thumbnail via render API -->
+    <!-- Preview thumbnail as image -->
     <div class="template-card__preview">
-      <iframe
-        :src="`/api/render?t=${template.id}`"
-        :title="template.name"
-        class="template-card__iframe"
-        :style="iframeStyle"
+      <div v-if="loading" class="template-card__loading">Loading...</div>
+      <img
+        v-else-if="coverUrl"
+        :src="coverUrl"
+        :alt="template.name"
+        class="template-card__cover"
       />
+      <div v-else class="template-card__placeholder">No preview</div>
     </div>
 
     <div class="template-card__body">
@@ -83,12 +86,21 @@ const iframeStyle = computed(() => {
   position: relative;
 }
 
-.template-card__iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  border: none;
-  pointer-events: none;
+.template-card__cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.template-card__loading,
+.template-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 12px;
+  color: var(--mp-muted);
 }
 
 .template-card__body {

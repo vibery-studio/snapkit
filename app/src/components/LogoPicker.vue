@@ -59,17 +59,20 @@ const POSITIONS = [
       </label>
     </div>
 
-    <!-- Position buttons (only visible when a logo is selected) -->
+    <!-- Position grid (only visible when a logo is selected) -->
     <div v-if="modelValue" class="logo-picker__positions">
       <span class="logo-picker__pos-label">Position</span>
-      <div class="logo-picker__pos-btns">
+      <div class="logo-picker__pos-grid">
         <button
           v-for="pos in POSITIONS"
           :key="pos.value"
           type="button"
           :class="['logo-picker__pos-btn', { 'logo-picker__pos-btn--active': position === pos.value }]"
+          :title="pos.value"
           @click="emit('update:position', pos.value)"
-        >{{ pos.label }}</button>
+        >
+          <span class="logo-picker__pos-dot" />
+        </button>
       </div>
     </div>
   </div>
@@ -132,31 +135,45 @@ const POSITIONS = [
   white-space: nowrap;
 }
 
-.logo-picker__pos-btns {
-  display: flex;
-  gap: var(--mp-s1);
+.logo-picker__pos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  width: 44px;
+  height: 44px;
+  background: var(--mp-rule);
+  border: 1px solid var(--mp-rule);
+  border-radius: var(--mp-radius-sm);
+  overflow: hidden;
 }
 
 .logo-picker__pos-btn {
   background: var(--mp-bg2);
-  border: 1px solid var(--mp-rule);
-  border-radius: var(--mp-radius-sm);
-  font-family: var(--mp-font-mono);
-  font-size: 11px;
-  color: var(--mp-muted);
-  padding: 4px 8px;
+  border: none;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s;
 }
 
 .logo-picker__pos-btn:hover {
   background: var(--mp-bg3);
-  color: var(--mp-ink);
 }
 
 .logo-picker__pos-btn--active {
   background: var(--mp-terra);
-  border-color: var(--mp-terra);
-  color: #fff;
+}
+
+.logo-picker__pos-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mp-muted);
+}
+
+.logo-picker__pos-btn--active .logo-picker__pos-dot {
+  background: #fff;
 }
 </style>

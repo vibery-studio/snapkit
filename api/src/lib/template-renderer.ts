@@ -11,6 +11,7 @@ function pageShell(thumbnailHtml: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;600;700&display=block" />
   <style>
     @font-face { font-family: 'Montserrat'; src: url('/fonts/Montserrat-Bold.woff2') format('woff2'); font-weight: 700; font-display: block; }
     @font-face { font-family: 'Montserrat'; src: url('/fonts/Montserrat-ExtraBold.woff2') format('woff2'); font-weight: 800; font-display: block; }
@@ -22,6 +23,38 @@ function pageShell(thumbnailHtml: string): string {
 </head>
 <body>
   ${thumbnailHtml}
+  <script>
+    // Wait for all images to load before signaling ready
+    (function() {
+      var images = document.querySelectorAll('img');
+      var bgImages = [];
+      // Extract background-image URLs
+      document.querySelectorAll('[style*="background-image"]').forEach(function(el) {
+        var match = el.style.backgroundImage.match(/url\\(["']?([^"')]+)["']?\\)/);
+        if (match && match[1]) bgImages.push(match[1]);
+      });
+
+      var pending = images.length + bgImages.length;
+      if (pending === 0) { document.body.classList.add('ready'); return; }
+
+      function done() { if (--pending <= 0) document.body.classList.add('ready'); }
+
+      images.forEach(function(img) {
+        if (img.complete) done();
+        else { img.onload = done; img.onerror = done; }
+      });
+
+      bgImages.forEach(function(src) {
+        var img = new Image();
+        img.onload = done;
+        img.onerror = done;
+        img.src = src;
+      });
+
+      // Fallback: mark ready after 5s max
+      setTimeout(function() { document.body.classList.add('ready'); }, 5000);
+    })();
+  </script>
 </body>
 </html>`;
 }
@@ -44,10 +77,11 @@ export async function renderDesignToHTML(design: Design, env?: Env): Promise<str
   const title_color = params.title_color || brand?.colors.secondary;
   const subtitle_color = params.subtitle_color || brand?.colors.text_light;
 
-  const showLogo = params.showLogo === 'true' || params.showLogo === '1';
-  const logo = showLogo && brand?.logos[0]?.url ? brand.logos[0].url : undefined;
+  const hideLogo = params.showLogo === 'false' || params.showLogo === '0';
+  const logo = !hideLogo && brand?.logos[0]?.url ? brand.logos[0].url : (params.logo || undefined);
 
   const thumbnailHtml = layout.render({
+    ...params,
     width,
     height,
     title: params.title,
@@ -59,7 +93,7 @@ export async function renderDesignToHTML(design: Design, env?: Env): Promise<str
     overlay: params.overlay as 'none' | 'light' | 'medium' | 'dark',
     logo,
     feature_image: params.feature_image,
-  });
+  } as any);
 
   return pageShell(thumbnailHtml);
 }
@@ -97,6 +131,7 @@ export async function renderInlineToHTML(
   const logo = params.logo || (brand?.logos[0]?.url ? brand.logos[0].url : undefined);
 
   const thumbnailHtml = layout.render({
+    ...params,
     width,
     height,
     title: params.title,
@@ -109,7 +144,7 @@ export async function renderInlineToHTML(
     logo,
     logo_position: params.logo_position as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
     feature_image: params.feature_image,
-  });
+  } as any);
 
   return pageShell(thumbnailHtml);
 }

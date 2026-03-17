@@ -3,12 +3,14 @@
 export interface Env {
   R2_BUCKET: R2Bucket;
   DB: D1Database;
+  ASSETS: { fetch: (req: Request) => Promise<Response> };
   UNSPLASH_ACCESS_KEY?: string;
   PEXELS_API_KEY?: string;
   AI?: { run: (model: string, input: unknown) => Promise<{ response?: string }> };
   WINDMILL_BASE?: string;
   WINDMILL_TOKEN?: string;
   WINDMILL_WORKSPACE?: string;
+  TONYAPI_KEY?: string;
 }
 
 export interface SizePreset {

@@ -43,6 +43,12 @@ function buildValuesMap(p: LayoutRenderParams): Record<string, string> {
     image_2: extra.image_2 || '',
     watermark_url: extra.watermark_url || '',
     watermark_opacity: extra.watermark_opacity || 'light',
+    // Pass through any extra params for custom layouts
+    ...Object.fromEntries(
+      Object.entries(extra)
+        .filter(([k, v]) => typeof v === 'string' && !['width', 'height'].includes(k))
+        .map(([k, v]) => [k, v || ''])
+    ),
   };
 }
 

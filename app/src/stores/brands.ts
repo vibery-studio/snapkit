@@ -24,8 +24,7 @@ export const useBrandsStore = defineStore('brands', () => {
     loading.value = true
     error.value = null
     try {
-      const data = await apiFetch<{ brands: BrandKit[] }>('/api/brands')
-      brands.value = data.brands
+      brands.value = await apiFetch<BrandKit[]>('/api/brands')
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load brands'
     } finally {
