@@ -1,8 +1,8 @@
 # Stage 1: Build Vue frontend
 FROM node:20-alpine AS frontend
 WORKDIR /app
-COPY app/package.json app/package-lock.json ./
-RUN npm ci
+COPY app/package.json ./
+RUN npm install
 COPY app/ ./
 RUN npm run build
 
