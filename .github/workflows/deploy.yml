@@ -1,0 +1,42 @@
+name: Deploy SnapKit
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', '*.md']
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest code
+        run: cd /opt/snapkit && git pull origin main
+
+      - name: Build Docker image
+        run: cd /opt/snapkit && docker build -t snapkit:latest .
+
+      - name: Restart container
+        run: |
+          docker rm -f snapkit 2>/dev/null || true
+          docker run -d --name snapkit \
+            --network dokploy-network \
+            -v /opt/snapkit/brands:/app/brands \
+            -v /opt/snapkit-data:/app/data \
+            --restart unless-stopped \
+            --label 'traefik.enable=true' \
+            --label 'traefik.http.routers.snapkit.rule=Host(`snapkit.vibery.app`)' \
+            --label 'traefik.http.routers.snapkit.entrypoints=websecure' \
+            --label 'traefik.http.routers.snapkit.tls.certresolver=letsencrypt' \
+            --label 'traefik.http.services.snapkit.loadbalancer.server.port=8080' \
+            snapkit:latest
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          STATUS=$(curl -sk -o /dev/null -w "%{http_code}" https://snapkit.vibery.app/api/sizes)
+          if [ "$STATUS" != "200" ]; then
+            echo "Deploy verification failed (status: $STATUS)"
+            docker logs snapkit 2>&1 | tail -20
+            exit 1
+          fi
+          echo "Deploy OK"
