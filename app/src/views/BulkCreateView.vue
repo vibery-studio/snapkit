@@ -36,7 +36,7 @@ const parsedItems = computed((): BulkItem[] => {
     .filter(line => line.length > 0)
     .map(line => {
       const parts = line.split('|').map(s => s.trim())
-      return { title: parts[0], feature_image: parts[1] || '' }
+      return { title: parts[0] || '', feature_image: parts[1] || '' }
     })
 })
 
@@ -77,9 +77,9 @@ async function downloadOne(idx: number) {
   const cardEl = document.querySelector(`[data-bulk-idx="${idx}"] #thumbnail`) as HTMLElement
   if (!cardEl) return
   const { snapdom } = await import('@zumer/snapdom')
-  const result = await snapdom(cardEl, { scale: 1 })
+  const result = await snapdom(cardEl) as any
   const canvas = await result.toCanvas()
-  const blob = await new Promise<Blob>(r => canvas.toBlob(b => r(b!), 'image/png'))
+  const blob = await new Promise<Blob>(r => canvas.toBlob((b: Blob) => r(b), 'image/png'))
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -102,9 +102,9 @@ async function downloadAll() {
     for (let i = 0; i < previews.value.length; i++) {
       const el = document.querySelector(`[data-bulk-idx="${i}"] #thumbnail`) as HTMLElement
       if (!el) continue
-      const result = await snapdom(el, { scale: 1 })
+      const result = await snapdom(el) as any
       const canvas = await result.toCanvas()
-      const blob = await new Promise<Blob>(r => canvas.toBlob(b => r(b!), 'image/png'))
+      const blob = await new Promise<Blob>(r => canvas.toBlob((b: Blob) => r(b), 'image/png'))
       const name = `${(parsedItems.value[i]?.title || 'banner').replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF ]/g, '').trim().substring(0, 50)}-${i + 1}.png`
       zip.file(name, blob)
     }

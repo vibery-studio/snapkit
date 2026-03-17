@@ -9,7 +9,7 @@ import type { BrandKit } from '../types'
 import { snapdom } from '@zumer/snapdom'
 import MpButton from '../components/ui/MpButton.vue'
 import MpInput from '../components/ui/MpInput.vue'
-import LayoutRenderer from '../components/LayoutRenderer.vue'
+// LayoutRenderer no longer used — preview is server-rendered via v-html
 import BackgroundPicker from '../components/BackgroundPicker.vue'
 import LogoPicker from '../components/LogoPicker.vue'
 import ImagePicker from '../components/ImagePicker.vue'
@@ -206,9 +206,9 @@ async function exportPng() {
     wrapper!.style.transform = 'none'
 
     // Capture with snapdom at native resolution
-    const result = await snapdom(thumb, { scale: 1 })
+    const result = await snapdom(thumb) as any
     const canvas = await result.toCanvas()
-    const blob = await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b!), 'image/png'))
+    const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b: Blob) => resolve(b), 'image/png'))
 
     // Restore transform
     wrapper!.style.transform = origT
