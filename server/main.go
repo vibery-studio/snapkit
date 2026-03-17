@@ -44,10 +44,26 @@ func main() {
 	r.Static("/brands", brandsDir)
 	r.Static("/uploads", filepath.Join(dataDir, "uploads"))
 
-	// Serve fonts from app/public/fonts if available
+	// Serve fonts from app/public/fonts or static/fonts
 	fontsDir := filepath.Join(rootDir, "app", "public", "fonts")
 	if _, err := os.Stat(fontsDir); err == nil {
 		r.Static("/fonts", fontsDir)
+	} else if _, err := os.Stat(filepath.Join(rootDir, "static", "fonts")); err == nil {
+		r.Static("/fonts", filepath.Join(rootDir, "static", "fonts"))
+	}
+
+	// SPA: serve Vue build from static/ if it exists (production)
+	staticDir := filepath.Join(rootDir, "static")
+	if _, err := os.Stat(staticDir); err == nil {
+		r.Static("/assets", filepath.Join(staticDir, "assets"))
+		r.NoRoute(func(c *gin.Context) {
+			// API 404s stay as JSON
+			if len(c.Request.URL.Path) > 4 && c.Request.URL.Path[:5] == "/api/" {
+				c.JSON(404, gin.H{"error": "not found"})
+				return
+			}
+			c.File(filepath.Join(staticDir, "index.html"))
+		})
 	}
 
 	api := r.Group("/api")
