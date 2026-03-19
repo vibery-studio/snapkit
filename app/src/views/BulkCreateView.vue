@@ -12,7 +12,7 @@ onMounted(() => canvas.loadTemplates())
 
 // --- Download helpers (snapdom + jszip) ---
 
-async function captureItem(id: string): Promise<{ name: string; blob: Blob } | null> {
+async function captureItem(id: string): Promise<{ id: string; blob: Blob } | null> {
   const card = document.querySelector(`[data-bulk-id="${id}"]`) as HTMLElement
   if (!card) return null
 
@@ -46,9 +46,7 @@ async function captureItem(id: string): Promise<{ name: string; blob: Blob } | n
   card.style.overflow = origCardOverflow
   card.style.position = origCardPos
 
-  const item = canvas.items.value.find(i => i.id === id)
-  const name = (item?.title || 'banner').replace(/[^a-zA-Z0-9\u00C0-\u024F\u1E00-\u1EFF ]/g, '').trim().substring(0, 50)
-  return { name: `${name}-${id}.png`, blob }
+  return { id, blob }
 }
 
 async function downloadZip(ids: string[]) {
@@ -57,9 +55,12 @@ async function downloadZip(ids: string[]) {
     const JSZip = (await import('jszip')).default
     const zip = new JSZip()
 
-    for (const id of ids) {
-      const result = await captureItem(id)
-      if (result) zip.file(result.name, result.blob)
+    for (let i = 0; i < ids.length; i++) {
+      const result = await captureItem(ids[i]!)
+      if (!result) continue
+      const item = canvas.items.value.find(it => it.id === result.id)
+      const filename = item ? canvas.exportFilename(item, i + 1) : `banner-${i + 1}.png`
+      zip.file(filename, result.blob)
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' })
@@ -107,10 +108,12 @@ function onViewDrop(e: DragEvent) {
     <BulkCanvasToolbar
       :templates="canvas.templates.value"
       :selectedTemplateId="canvas.selectedTemplateId.value"
+      :globalTitle="canvas.globalTitle.value"
       :itemCount="canvas.items.value.length"
       :selectedCount="canvas.selectedItems.value.length"
       :rendering="canvas.renderQueue.value > 0 || downloading"
       @update:selectedTemplateId="canvas.selectedTemplateId.value = $event"
+      @update:globalTitle="canvas.globalTitle.value = $event"
       @add-files="canvas.addImages($event)"
       @add-url="canvas.addImageUrls([$event])"
       @toggle-select-all="canvas.toggleSelectAll()"

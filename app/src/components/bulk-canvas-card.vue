@@ -81,7 +81,7 @@ onMounted(() => {
     </div>
 
     <!-- Label -->
-    <div class="card__label">{{ item.title || 'Untitled' }}</div>
+    <div class="card__label">{{ item.fileTitle || item.title || 'Untitled' }}</div>
   </div>
 </template>
 

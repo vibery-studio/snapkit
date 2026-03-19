@@ -7,6 +7,7 @@ export interface BulkCanvasItem {
   featureImage: string
   title: string
   subtitle: string
+  fileTitle: string
   params: Record<string, string>
   previewHtml: string
   selected: boolean
@@ -25,11 +26,23 @@ interface TemplateInfo {
 let nextId = 1
 function uid() { return `bulk-${nextId++}` }
 
+// Remove Vietnamese diacritics and slugify
+function slugify(text: string): string {
+  return text
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    || 'banner'
+}
+
 export function useBulkCanvas() {
   const mediaStore = useMediaStore()
 
   const templates = ref<TemplateInfo[]>([])
   const selectedTemplateId = ref('')
+  const globalTitle = ref('')
   const items = ref<BulkCanvasItem[]>([])
   const editingItemId = ref<string | null>(null)
   const renderQueue = ref(0)
@@ -57,11 +70,18 @@ export function useBulkCanvas() {
       featureImage,
       title,
       subtitle: '',
+      fileTitle: '',
       params: {},
       previewHtml: '',
       selected: true,
       loading: false,
     }
+  }
+
+  // Generate export filename for an item at given index (1-based)
+  function exportFilename(item: BulkCanvasItem, index: number): string {
+    const base = slugify(item.fileTitle || globalTitle.value)
+    return `${base}-${index}.png`
   }
 
   async function addImages(files: File[]) {
@@ -140,7 +160,8 @@ export function useBulkCanvas() {
     const item = items.value.find(i => i.id === id)
     if (!item) return
 
-    // Handle special keys
+    // Handle special keys — auto-slugify fileTitle
+    if (key === 'fileTitle') { item.fileTitle = slugify(value); return }
     if (key === 'title') item.title = value
     else if (key === 'subtitle') item.subtitle = value
     else if (key === 'feature_image') item.featureImage = value
@@ -182,11 +203,12 @@ export function useBulkCanvas() {
 
   return {
     templates, selectedTemplateId, selectedTemplate,
+    globalTitle,
     items, editingItemId, editingItem, renderQueue,
     loadTemplates,
     addImages, addImageUrls, removeItem,
     renderItem, renderAll,
-    updateItemParam,
+    updateItemParam, exportFilename,
     toggleItem, selectAll, deselectAll, toggleSelectAll, selectedItems,
     openEditor, closeEditor,
   }

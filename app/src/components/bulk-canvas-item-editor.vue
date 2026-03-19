@@ -76,6 +76,14 @@ onUnmounted(() => {
         @update:modelValue="onParamUpdate('feature_image', $event)"
       />
 
+      <!-- File title (for export filename, not rendered in template) -->
+      <MpInput
+        label="File Title"
+        :modelValue="item.fileTitle"
+        placeholder="Override export filename"
+        @update:modelValue="onParamUpdate('fileTitle', $event)"
+      />
+
       <!-- Title / Subtitle -->
       <MpInput
         label="Title"

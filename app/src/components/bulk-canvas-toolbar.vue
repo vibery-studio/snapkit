@@ -3,9 +3,12 @@ import { ref } from 'vue'
 import MpButton from './ui/MpButton.vue'
 import ImagePicker from './ImagePicker.vue'
 
+import MpInput from './ui/MpInput.vue'
+
 const props = defineProps<{
   templates: Array<{ id: string; name: string; brand: string; layout: string; size: string }>
   selectedTemplateId: string
+  globalTitle: string
   itemCount: number
   selectedCount: number
   rendering: boolean
@@ -13,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:selectedTemplateId': [id: string]
+  'update:globalTitle': [title: string]
   'add-files': [files: File[]]
   'add-url': [url: string]
   'toggle-select-all': []
@@ -61,6 +65,16 @@ function onImagePickerSelect(url: string) {
           {{ t.name }} ({{ t.brand }})
         </option>
       </select>
+    </div>
+
+    <!-- Global title for export filenames -->
+    <div class="toolbar__section">
+      <MpInput
+        label="Export Name"
+        :modelValue="globalTitle"
+        placeholder="e.g. may-ep-nhua-servo"
+        @update:modelValue="emit('update:globalTitle', $event)"
+      />
     </div>
 
     <!-- Drop zone -->
