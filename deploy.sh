@@ -10,6 +10,9 @@ APP_DIR="/opt/snapkit"
 echo "=== Pushing to GitHub ==="
 git push origin main
 
+echo "=== Syncing brands assets ==="
+rsync -avz --delete brands/ $SERVER:$APP_DIR/brands/
+
 echo "=== Building on server ==="
 ssh -o ServerAliveInterval=5 $SERVER "cd $APP_DIR && git pull && docker build -t snapkit:latest ."
 
