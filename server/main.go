@@ -40,6 +40,13 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	// Auth routes (before middleware)
+	r.GET("/login", handlers.HandleLogin)
+	r.POST("/auth/login", handlers.HandleLoginPost)
+
+	// Password gate (skip /login, /auth/login, static assets)
+	r.Use(handlers.AuthMiddleware())
+
 	// Static files
 	r.Static("/brands", brandsDir)
 	r.Static("/uploads", filepath.Join(dataDir, "uploads"))

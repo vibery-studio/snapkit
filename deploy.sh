@@ -21,6 +21,7 @@ ssh -o ServerAliveInterval=5 $SERVER "docker rm -f snapkit 2>/dev/null; docker r
   --network dokploy-network \
   -v $APP_DIR/brands:/app/brands \
   -v /opt/snapkit-data:/app/data \
+  -e SNAPKIT_PASSWORD=\${SNAPKIT_PASSWORD:-snapkit2026} \
   --restart unless-stopped \
   --label 'traefik.enable=true' \
   --label 'traefik.http.routers.snapkit.rule=Host(\`snapkit.vibery.app\`)' \
