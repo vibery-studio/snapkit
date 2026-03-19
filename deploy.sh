@@ -32,7 +32,7 @@ ssh -o ServerAliveInterval=5 $SERVER "docker rm -f snapkit 2>/dev/null; docker r
 
 echo "=== Verifying ==="
 sleep 3
-STATUS=$(curl -sk -o /dev/null -w "%{http_code}" https://snapkit.vibery.app/api/sizes)
+STATUS=$(curl -sk -o /dev/null -w "%{http_code}" https://snapkit.vibery.app/login)
 if [ "$STATUS" = "200" ]; then
   echo "Deploy OK — https://snapkit.vibery.app"
 else
