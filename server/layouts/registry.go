@@ -32,6 +32,7 @@ func init() {
 	register(frame())
 	register(agencySplit())
 	register(brandShowcase())
+	register(innerFrame())
 }
 
 // GetBuiltinIDs returns all built-in layout IDs
