@@ -67,7 +67,7 @@ export function useBulkCanvas() {
   async function addImages(files: File[]) {
     const uploads = files.map(async (file) => {
       const media = await mediaStore.uploadFile(file)
-      const item = createItem(media.url, file.name.replace(/\.[^.]+$/, ''))
+      const item = createItem(media.url)
       items.value.push(item)
       return item.id
     })
