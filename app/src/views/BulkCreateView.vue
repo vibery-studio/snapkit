@@ -37,8 +37,9 @@ async function captureCanvas(id: string): Promise<{ id: string; canvas: HTMLCanv
   }))
 
   const { snapdom } = await import('@zumer/snapdom')
-  const result = await snapdom(thumb) as any
-  const c = await result.toCanvas() as HTMLCanvasElement
+  // scale:1 ensures we capture at exact CSS pixel dimensions (not retina 2x)
+  const result = await snapdom(thumb, { scale: 1 })
+  const c = await result.toCanvas({ scale: 1 }) as HTMLCanvasElement
 
   // Restore
   if (scaleEl) scaleEl.style.transform = origTransform

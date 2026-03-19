@@ -205,10 +205,10 @@ async function exportPng() {
     const origT = wrapper!.style.transform
     wrapper!.style.transform = 'none'
 
-    // Capture with snapdom at native resolution
-    const result = await snapdom(thumb) as any
-    const canvas = await result.toCanvas()
-    const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b: Blob) => resolve(b), 'image/png'))
+    // Capture at exact CSS pixel dimensions (scale:1 avoids retina 2x)
+    const result = await snapdom(thumb, { scale: 1 })
+    const canvas = await result.toCanvas({ scale: 1 })
+    const blob = await new Promise<Blob>((resolve) => canvas.toBlob((b) => resolve(b!), 'image/png'))
 
     // Restore transform
     wrapper!.style.transform = origT

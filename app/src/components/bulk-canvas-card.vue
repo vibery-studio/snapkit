@@ -160,6 +160,7 @@ onMounted(() => {
 .card__render-inner {
   transform-origin: top left;
   pointer-events: none;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .card__placeholder {
