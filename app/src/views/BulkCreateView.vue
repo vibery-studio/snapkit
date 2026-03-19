@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useBulkCanvas, compressToBlob } from '../composables/use-bulk-canvas'
 import BulkCanvasToolbar from '../components/bulk-canvas-toolbar.vue'
 import BulkCanvasGrid from '../components/bulk-canvas-grid.vue'
@@ -7,8 +8,14 @@ import BulkCanvasItemEditor from '../components/bulk-canvas-item-editor.vue'
 
 const canvas = useBulkCanvas()
 const downloading = ref(false)
+const route = useRoute()
 
-onMounted(() => canvas.loadTemplates())
+onMounted(async () => {
+  await canvas.loadTemplates()
+  // Pre-select template from query param: ?t=templateId
+  const qTemplate = route.query.t as string
+  if (qTemplate) canvas.selectedTemplateId.value = qTemplate
+})
 
 // --- Download helpers (snapdom + jszip) ---
 

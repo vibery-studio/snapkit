@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Template } from '../stores/templates'
 import MpBadge from './ui/MpBadge.vue'
 import MpButton from './ui/MpButton.vue'
@@ -12,6 +13,16 @@ const emit = defineEmits<{
   edit: []
   delete: []
 }>()
+
+const router = useRouter()
+
+function useInBuilder() {
+  router.push({ path: '/', query: { t: props.template.id, brand: props.template.brand } })
+}
+
+function useInBulk() {
+  router.push({ path: '/bulk', query: { t: props.template.id } })
+}
 
 const previewHtml = ref('')
 const loading = ref(true)
@@ -46,6 +57,11 @@ onMounted(async () => {
         <span class="template-card__detail">{{ template.size }}</span>
         <span class="template-card__sep">&middot;</span>
         <span class="template-card__detail">{{ template.brand }}</span>
+      </div>
+
+      <div class="template-card__use">
+        <MpButton variant="primary" size="sm" @click="useInBuilder">Use (Single)</MpButton>
+        <MpButton variant="primary" size="sm" @click="useInBulk">Use (Bulk)</MpButton>
       </div>
 
       <div class="template-card__actions">
@@ -135,9 +151,13 @@ onMounted(async () => {
   font-size: 10px;
 }
 
+.template-card__use {
+  display: flex;
+  gap: var(--mp-s2);
+}
+
 .template-card__actions {
   display: flex;
   gap: var(--mp-s2);
-  margin-top: var(--mp-s1);
 }
 </style>

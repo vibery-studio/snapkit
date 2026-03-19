@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import { useBuilderStore } from '../stores/builder'
 import { useBrands } from '../composables/use-brands'
 import { useLayouts } from '../composables/use-layouts'
@@ -107,10 +108,28 @@ watchEffect(() => {
   }, 300)
 })
 
+const route = useRoute()
+
 onMounted(async () => {
   await Promise.all([fetchBrands(), fetchLayouts(), fetchSizes()])
   const data = await apiFetch<Template[]>('/api/templates')
   templates.value = data
+
+  // Query param override: ?t=templateId&brand=brandId
+  const qTemplate = route.query.t as string
+  const qBrand = route.query.brand as string
+  if (qTemplate) {
+    const tpl = templates.value.find(t => t.id === qTemplate)
+    if (tpl) {
+      selectedBrandId.value = qBrand || tpl.brand
+      selectedTemplateId.value = qTemplate
+      // Wait for brand to load before applying template
+      await new Promise(r => setTimeout(r, 100))
+      applyTemplate(qTemplate)
+      return
+    }
+  }
+
   // Use saved brand or default to first
   if (!selectedBrandId.value && brands.value.length) selectedBrandId.value = brands.value[0]!.id
   // Re-apply saved template after data is loaded
