@@ -72,7 +72,7 @@ func SeedBrands() {
 		{"goha-minimal", "GOHA Minimal", "goha", "text-only", "ig-post", map[string]string{"title": "Simple. Elegant. Effective.", "bg_color": "#1a1a3e", "title_color": "#FFFFFF", "subtitle_color": "#FFD700"}},
 		{"goha-professional", "GOHA Professional", "goha", "overlay-center", "yt-thumbnail", map[string]string{"title": "Professional Excellence", "subtitle": "Building Trust Through Quality", "bg_color": "#1a1a3e", "title_color": "#FFD700", "subtitle_color": "#FFFFFF", "overlay": "dark", "bg_image": "/brands/goha/bg/default-background.png"}},
 		{"trungnguyen-showcase", "Trung Nguyên Showcase", "trungnguyen", "brand-showcase", "ig-post", map[string]string{"title": "Robot Máy Ép Nhựa – Xu Hướng Tự Động Hóa Ngành Nhựa", "cta_text": "XEM NGAY", "footer_text": "0986 403 790 – 098 210 3223\ndinhduong@trungnguyentw.com\ntrungnguyentw.com", "accent_color": "#fc7400", "title_color": "#FFFFFF", "frame_image": "/brands/trungnguyen/frame_left.png", "feature_image": "/brands/trungnguyen/sample_cover_2.jpg"}},
-		{"trungnguyen-inner-frame", "Trung Nguyên Inner Frame", "trungnguyen", "inner-frame", "ig-post", map[string]string{"feature_image": "/brands/trungnguyen/inner-frame-default-thumb.jpg", "frame_image": "/brands/trungnguyen/bottom-frame.png", "phone_text": "0986 403 790 – 098 210 3223", "website_text": "trungnguyentw.com"}},
+		{"trungnguyen-inner-frame", "Trung Nguyên Inner Frame", "trungnguyen", "inner-frame", "ig-post", map[string]string{"feature_image": "/brands/trungnguyen/inner-frame-default-v2.jpg", "frame_image": "/brands/trungnguyen/bottom-frame.png", "phone_text": "0986 403 790 – 098 210 3223", "website_text": "trungnguyentw.com"}},
 	}
 
 	for _, t := range templates {
