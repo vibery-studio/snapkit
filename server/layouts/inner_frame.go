@@ -49,7 +49,7 @@ func innerFrame() *BuiltinLayout {
 			logoHTML := ""
 			if safeLogo != "" {
 				logoHTML = fmt.Sprintf(`<img src="%s" alt="logo" style="position:absolute;bottom:%dpx;left:%dpx;height:%dpx;max-width:%dpx;object-fit:contain;z-index:3;" crossorigin="anonymous" onerror="this.style.display='none'" />`,
-					safeLogo, r(20), r(30), r(120), int(math.Round(float64(w)*0.22)))
+					safeLogo, r(25), r(30), r(110), int(math.Round(float64(w)*0.22)))
 			}
 
 			// Phone icon + text — center of the bar
@@ -72,12 +72,12 @@ func innerFrame() *BuiltinLayout {
 			contactHTML := ""
 			if phoneHTML != "" || webHTML != "" {
 				// Use a 3-column grid: empty left (logo space) | phone center | website right
-				contactHTML = fmt.Sprintf(`<div style="position:absolute;bottom:0;left:0;right:0;height:%dpx;display:grid;grid-template-columns:%dpx 1fr auto;align-items:center;align-content:end;padding-bottom:%dpx;z-index:3;color:#FFFFFF;font-family:'TikTok Sans','Be Vietnam Pro',sans-serif;font-size:%dpx;font-weight:600;">
+				contactHTML = fmt.Sprintf(`<div style="position:absolute;bottom:0;left:0;right:0;height:%dpx;display:grid;grid-template-columns:%dpx 1fr auto;align-items:center;z-index:3;color:#FFFFFF;font-family:'TikTok Sans','Be Vietnam Pro',sans-serif;font-size:%dpx;font-weight:600;">
   <div></div>
   <div style="display:flex;justify-content:center;">%s</div>
   <div style="padding-right:%dpx;">%s</div>
 </div>`,
-					r(200), int(math.Round(float64(w)*0.25)), r(30), r(22), phoneHTML, r(30), webHTML)
+					r(160), int(math.Round(float64(w)*0.25)), r(22), phoneHTML, r(30), webHTML)
 			}
 
 			return fmt.Sprintf(`<div id="thumbnail" style="position:relative;width:%dpx;height:%dpx;overflow:hidden;">
