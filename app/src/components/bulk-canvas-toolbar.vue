@@ -5,10 +5,13 @@ import ImagePicker from './ImagePicker.vue'
 
 import MpInput from './ui/MpInput.vue'
 
+import type { ExportPreset } from '../composables/use-bulk-canvas'
+
 const props = defineProps<{
   templates: Array<{ id: string; name: string; brand: string; layout: string; size: string }>
   selectedTemplateId: string
   globalTitle: string
+  exportPreset: ExportPreset
   itemCount: number
   selectedCount: number
   rendering: boolean
@@ -17,12 +20,18 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:selectedTemplateId': [id: string]
   'update:globalTitle': [title: string]
+  'update:exportPreset': [preset: ExportPreset]
   'add-files': [files: File[]]
   'add-url': [url: string]
   'toggle-select-all': []
   'download-selected': []
   'download-all': []
 }>()
+
+function updatePreset(key: keyof ExportPreset, value: string) {
+  const num = parseInt(value) || 0
+  emit('update:exportPreset', { ...props.exportPreset, [key]: num })
+}
 
 const isDragOver = ref(false)
 const showImagePicker = ref(false)
@@ -96,6 +105,40 @@ function onImagePickerSelect(url: string) {
       <MpButton variant="ghost" size="sm" style="width:100%;margin-top:6px" @click="showImagePicker = true">
         Add from Library
       </MpButton>
+    </div>
+
+    <!-- Export preset -->
+    <div class="toolbar__section">
+      <label class="toolbar__label">Export Size</label>
+      <div class="toolbar__row">
+        <input
+          type="number"
+          class="toolbar__num"
+          placeholder="W"
+          :value="exportPreset.width || ''"
+          @input="updatePreset('width', ($event.target as HTMLInputElement).value)"
+        />
+        <span class="toolbar__x">&times;</span>
+        <input
+          type="number"
+          class="toolbar__num"
+          placeholder="H"
+          :value="exportPreset.height || ''"
+          @input="updatePreset('height', ($event.target as HTMLInputElement).value)"
+        />
+      </div>
+      <label class="toolbar__label" style="margin-top:6px">Max File Size (KB)</label>
+      <input
+        type="number"
+        class="toolbar__num toolbar__num--full"
+        placeholder="0 = no limit (PNG)"
+        :value="exportPreset.maxSizeKb || ''"
+        @input="updatePreset('maxSizeKb', ($event.target as HTMLInputElement).value)"
+      />
+      <div class="toolbar__hint">
+        {{ exportPreset.maxSizeKb ? 'JPEG, best quality under limit' : 'PNG, lossless' }}
+        {{ exportPreset.width && exportPreset.height ? ` · ${exportPreset.width}×${exportPreset.height}` : ' · Original size' }}
+      </div>
     </div>
 
     <!-- Actions -->
@@ -210,6 +253,39 @@ function onImagePickerSelect(url: string) {
   font-weight: 600;
   color: var(--mp-ink, #333);
   padding: 4px 0;
+}
+
+.toolbar__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar__x {
+  color: var(--mp-muted, #999);
+  font-size: 13px;
+}
+
+.toolbar__num {
+  width: 70px;
+  background: var(--mp-bg2, #f5f5f5);
+  border: 1px solid var(--mp-rule, #e5e5e5);
+  border-radius: var(--mp-radius, 6px);
+  padding: 6px 8px;
+  font-size: 13px;
+  color: var(--mp-ink, #333);
+  text-align: center;
+}
+
+.toolbar__num--full {
+  width: 100%;
+  text-align: left;
+}
+
+.toolbar__hint {
+  font-size: 11px;
+  color: var(--mp-muted, #999);
+  margin-top: 4px;
 }
 
 @media (max-width: 768px) {

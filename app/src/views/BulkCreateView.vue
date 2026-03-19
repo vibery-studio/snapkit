@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useBulkCanvas } from '../composables/use-bulk-canvas'
+import { useBulkCanvas, compressToBlob } from '../composables/use-bulk-canvas'
 import BulkCanvasToolbar from '../components/bulk-canvas-toolbar.vue'
 import BulkCanvasGrid from '../components/bulk-canvas-grid.vue'
 import BulkCanvasItemEditor from '../components/bulk-canvas-item-editor.vue'
@@ -12,7 +12,7 @@ onMounted(() => canvas.loadTemplates())
 
 // --- Download helpers (snapdom + jszip) ---
 
-async function captureItem(id: string): Promise<{ id: string; blob: Blob } | null> {
+async function captureCanvas(id: string): Promise<{ id: string; canvas: HTMLCanvasElement } | null> {
   const card = document.querySelector(`[data-bulk-id="${id}"]`) as HTMLElement
   if (!card) return null
 
@@ -38,29 +38,33 @@ async function captureItem(id: string): Promise<{ id: string; blob: Blob } | nul
 
   const { snapdom } = await import('@zumer/snapdom')
   const result = await snapdom(thumb) as any
-  const c = await result.toCanvas()
-  const blob = await new Promise<Blob>(r => c.toBlob((b: Blob) => r(b), 'image/png'))
+  const c = await result.toCanvas() as HTMLCanvasElement
 
   // Restore
   if (scaleEl) scaleEl.style.transform = origTransform
   card.style.overflow = origCardOverflow
   card.style.position = origCardPos
 
-  return { id, blob }
+  return { id, canvas: c }
 }
 
 async function downloadZip(ids: string[]) {
   downloading.value = true
+  const preset = canvas.exportPreset.value
   try {
     const JSZip = (await import('jszip')).default
     const zip = new JSZip()
 
     for (let i = 0; i < ids.length; i++) {
-      const result = await captureItem(ids[i]!)
+      const result = await captureCanvas(ids[i]!)
       if (!result) continue
+      const blob = await compressToBlob(result.canvas, preset)
       const item = canvas.items.value.find(it => it.id === result.id)
-      const filename = item ? canvas.exportFilename(item, i + 1) : `banner-${i + 1}.png`
-      zip.file(filename, result.blob)
+      // Use .jpg extension when compressed with size limit
+      const ext = preset.maxSizeKb > 0 ? 'jpg' : 'png'
+      const baseName = item ? canvas.exportFilename(item, i + 1) : `banner-${i + 1}.png`
+      const filename = baseName.replace(/\.png$/, `.${ext}`)
+      zip.file(filename, blob)
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' })
@@ -109,11 +113,13 @@ function onViewDrop(e: DragEvent) {
       :templates="canvas.templates.value"
       :selectedTemplateId="canvas.selectedTemplateId.value"
       :globalTitle="canvas.globalTitle.value"
+      :exportPreset="canvas.exportPreset.value"
       :itemCount="canvas.items.value.length"
       :selectedCount="canvas.selectedItems.value.length"
       :rendering="canvas.renderQueue.value > 0 || downloading"
       @update:selectedTemplateId="canvas.selectedTemplateId.value = $event"
       @update:globalTitle="canvas.globalTitle.value = $event"
+      @update:exportPreset="canvas.exportPreset.value = $event"
       @add-files="canvas.addImages($event)"
       @add-url="canvas.addImageUrls([$event])"
       @toggle-select-all="canvas.toggleSelectAll()"

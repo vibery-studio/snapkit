@@ -37,12 +37,66 @@ function slugify(text: string): string {
     || 'banner'
 }
 
+export interface ExportPreset {
+  width: number     // 0 = original
+  height: number    // 0 = original
+  maxSizeKb: number // 0 = no limit (PNG)
+}
+
+// Resize canvas and compress to best JPEG quality under size limit
+export async function compressToBlob(
+  sourceCanvas: HTMLCanvasElement,
+  preset: ExportPreset,
+): Promise<Blob> {
+  const { width, height, maxSizeKb } = preset
+  const needsResize = width > 0 && height > 0
+  const hasLimit = maxSizeKb > 0
+
+  // Resize if needed
+  let canvas = sourceCanvas
+  if (needsResize) {
+    canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(sourceCanvas, 0, 0, width, height)
+  }
+
+  // No size limit → PNG (best quality)
+  if (!hasLimit) {
+    return new Promise<Blob>(r => canvas.toBlob(b => r(b!), 'image/png'))
+  }
+
+  // Binary search JPEG quality for best quality under limit
+  const maxBytes = maxSizeKb * 1024
+  let lo = 0.1, hi = 1.0, bestBlob: Blob | null = null
+
+  for (let i = 0; i < 8; i++) {
+    const mid = (lo + hi) / 2
+    const blob = await new Promise<Blob>(r => canvas.toBlob(b => r(b!), 'image/jpeg', mid))
+    if (blob.size <= maxBytes) {
+      bestBlob = blob
+      lo = mid  // try higher quality
+    } else {
+      hi = mid  // try lower quality
+    }
+  }
+
+  // Fallback: lowest quality if still too big
+  if (!bestBlob) {
+    bestBlob = await new Promise<Blob>(r => canvas.toBlob(b => r(b!), 'image/jpeg', 0.1))
+  }
+
+  return bestBlob
+}
+
 export function useBulkCanvas() {
   const mediaStore = useMediaStore()
 
   const templates = ref<TemplateInfo[]>([])
   const selectedTemplateId = ref('')
   const globalTitle = ref('')
+  const exportPreset = ref<ExportPreset>({ width: 0, height: 0, maxSizeKb: 0 })
   const items = ref<BulkCanvasItem[]>([])
   const editingItemId = ref<string | null>(null)
   const renderQueue = ref(0)
@@ -203,7 +257,7 @@ export function useBulkCanvas() {
 
   return {
     templates, selectedTemplateId, selectedTemplate,
-    globalTitle,
+    globalTitle, exportPreset,
     items, editingItemId, editingItem, renderQueue,
     loadTemplates,
     addImages, addImageUrls, removeItem,
