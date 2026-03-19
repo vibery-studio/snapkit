@@ -71,19 +71,18 @@ onMounted(async () => {
 
 .template-card__preview {
   width: 100%;
-  aspect-ratio: 16 / 9;
   background: var(--mp-bg3);
   overflow: hidden;
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
 .template-card__render {
   zoom: 0.25;
   pointer-events: none;
-  transform-origin: center center;
+  transform-origin: top center;
 }
 
 .template-card__placeholder {
