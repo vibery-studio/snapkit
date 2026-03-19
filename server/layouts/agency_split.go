@@ -80,7 +80,7 @@ func agencySplit() *BuiltinLayout {
   <div style="position:absolute;inset:0;background:linear-gradient(135deg,%scc 0%%,%s99 50%%,%s66 100%%);mix-blend-mode:multiply;"></div>
   %s
   <div style="position:absolute;top:0;right:0;width:50%%;height:100%%;display:flex;flex-direction:column;justify-content:center;padding:0 4%% 0 2%%;">
-    <h1 style="margin:0;font-size:%dpx;font-weight:600;line-height:1.25;color:%s;font-style:italic;">%s</h1>
+    <h1 style="margin:0;font-size:%dpx;font-weight:600;line-height:1.25;color:%s;">%s</h1>
     %s
   </div>
   %s

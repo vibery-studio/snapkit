@@ -50,6 +50,14 @@ function isActive(path: string) {
               <rect x="2" y="9" width="10" height="3" rx="1.5" fill="currentColor" opacity=".5"/>
               <rect x="2" y="14" width="7" height="3" rx="1.5" fill="currentColor" opacity=".3"/>
             </svg>
+            <!-- Bulk icon (grid of images) -->
+            <svg v-if="item.icon === 'bulk'" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="2" width="7" height="5" rx="1" fill="currentColor" opacity=".7"/>
+              <rect x="11" y="2" width="7" height="5" rx="1" fill="currentColor" opacity=".5"/>
+              <rect x="2" y="9" width="7" height="5" rx="1" fill="currentColor" opacity=".5"/>
+              <rect x="11" y="9" width="7" height="5" rx="1" fill="currentColor" opacity=".7"/>
+              <rect x="2" y="16" width="16" height="2" rx="1" fill="currentColor" opacity=".3"/>
+            </svg>
             <span class="mp-layout__nav-label">{{ item.label }}</span>
           </RouterLink>
         </li>
