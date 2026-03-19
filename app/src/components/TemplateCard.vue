@@ -13,18 +13,15 @@ const emit = defineEmits<{
   delete: []
 }>()
 
-const coverUrl = ref<string | null>(null)
+const previewHtml = ref('')
 const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const res = await fetch(`/api/screenshot?t=${props.template.id}`)
-    if (res.ok) {
-      const data = await res.json()
-      coverUrl.value = data.url
-    }
+    const res = await fetch(`/api/render/html?t=${props.template.id}`)
+    if (res.ok) previewHtml.value = await res.text()
   } catch {
-    // fallback: no cover image
+    // no preview
   } finally {
     loading.value = false
   }
@@ -33,15 +30,9 @@ onMounted(async () => {
 
 <template>
   <div class="template-card">
-    <!-- Preview thumbnail as image -->
     <div class="template-card__preview">
-      <div v-if="loading" class="template-card__loading">Loading...</div>
-      <img
-        v-else-if="coverUrl"
-        :src="coverUrl"
-        :alt="template.name"
-        class="template-card__cover"
-      />
+      <div v-if="loading" class="template-card__placeholder">Loading...</div>
+      <div v-else-if="previewHtml" class="template-card__render" v-html="previewHtml" />
       <div v-else class="template-card__placeholder">No preview</div>
     </div>
 
@@ -53,7 +44,7 @@ onMounted(async () => {
 
       <div class="template-card__meta">
         <span class="template-card__detail">{{ template.size }}</span>
-        <span class="template-card__sep">·</span>
+        <span class="template-card__sep">&middot;</span>
         <span class="template-card__detail">{{ template.brand }}</span>
       </div>
 
@@ -84,15 +75,17 @@ onMounted(async () => {
   background: var(--mp-bg3);
   overflow: hidden;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.template-card__cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.template-card__render {
+  zoom: 0.25;
+  pointer-events: none;
+  transform-origin: center center;
 }
 
-.template-card__loading,
 .template-card__placeholder {
   display: flex;
   align-items: center;
