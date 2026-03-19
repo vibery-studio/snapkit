@@ -84,6 +84,25 @@ Templates provide quick-start presets so users can immediately generate thumbnai
 - `BrandKit` - colors, fonts, logos[], backgrounds[], watermark
 - `Design` - saved configuration (layout + size + brand + params)
 
+## Deployment
+
+### Template/asset changes only (no layout code changes):
+```bash
+./sync-templates.sh prod    # rsync assets + upsert templates via API (~5s)
+./sync-templates.sh local   # same but against localhost:8080
+```
+
+### Layout code changes (new layouts, render logic):
+```bash
+./deploy.sh                 # git push + rsync assets + docker build + restart
+```
+
+### Adding a new template:
+1. Put brand assets in `brands/<brand>/`
+2. Add `upsert_template` call in `sync-templates.sh`
+3. If using existing layout: `./sync-templates.sh prod` (no rebuild)
+4. If new layout needed: add Go file in `server/layouts/`, register in `registry.go`, then `./deploy.sh`
+
 ## Documentation Management
 
 We keep all important docs in `./docs` folder and keep updating them, structure like below:
