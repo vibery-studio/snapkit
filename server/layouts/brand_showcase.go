@@ -3,6 +3,7 @@ package layouts
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 
 	"snapkit/engine"
@@ -22,6 +23,8 @@ func brandShowcase() *BuiltinLayout {
 				{Key: "feature_image", Type: "image", Label: "Feature Image", Required: true, Searchable: true},
 				{Key: "frame_image", Type: "image", Label: "Frame Overlay Image"},
 				{Key: "accent_color", Type: "color", Label: "Accent/CTA Color"},
+				{Key: "logo_scale", Type: "text", Label: "Logo Scale (e.g. 1.5)"},
+				{Key: "logo_offset_y", Type: "text", Label: "Logo Y Offset (px)"},
 			},
 		},
 		Render: func(p *engine.RenderParams) string {
@@ -58,10 +61,31 @@ func brandShowcase() *BuiltinLayout {
 				logoPosStyle = logoPosMap["top-left"]
 			}
 
+			// Logo scale and vertical offset
+			logoScale := 1.0
+			if v := p.Get("logo_scale"); v != "" {
+				if f, err := strconv.ParseFloat(v, 64); err == nil && f > 0 {
+					logoScale = f
+				}
+			}
+			logoOffsetY := 0
+			if v := p.Get("logo_offset_y"); v != "" {
+				if n, err := strconv.Atoi(v); err == nil {
+					logoOffsetY = r(float64(n))
+				}
+			}
+
 			logoHTML := ""
 			if safeLogo != "" {
-				logoHTML = fmt.Sprintf(`<img src="%s" alt="" style="position:absolute;%s;height:%dpx;max-width:%dpx;object-fit:contain;z-index:3;" onerror="this.style.display='none'" />`,
-					safeLogo, logoPosStyle, r(100), int(math.Round(float64(w)*0.4)))
+				logoH := int(math.Round(float64(r(100)) * logoScale))
+				logoMaxW := int(math.Round(float64(w) * 0.4 * logoScale))
+				// Apply vertical offset by adding margin-top
+				offsetStyle := ""
+				if logoOffsetY != 0 {
+					offsetStyle = fmt.Sprintf("margin-top:%dpx;", logoOffsetY)
+				}
+				logoHTML = fmt.Sprintf(`<img src="%s" alt="" style="position:absolute;%s;height:%dpx;max-width:%dpx;object-fit:contain;z-index:3;%s" onerror="this.style.display='none'" />`,
+					safeLogo, logoPosStyle, logoH, logoMaxW, offsetStyle)
 			}
 
 			ctaHTML := ""

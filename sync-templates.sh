@@ -52,6 +52,6 @@ upsert_template "trungnguyen-showcase" \
   "trungnguyen" \
   "brand-showcase" \
   "ig-post" \
-  '{"title":"Robot Máy Ép Nhựa – Xu Hướng Tự Động Hóa Ngành Nhựa","cta_text":"XEM NGAY","footer_text":"0986 403 790 – 098 210 3223\ndinhduong@trungnguyentw.com\ntrungnguyentw.com","accent_color":"#fc7400","title_color":"#FFFFFF","frame_image":"/brands/trungnguyen/frame_left.png","feature_image":"/brands/trungnguyen/sample_cover_2.jpg"}'
+  '{"title":"Robot Máy Ép Nhựa – Xu Hướng Tự Động Hóa Ngành Nhựa","cta_text":"XEM NGAY","footer_text":"0986 403 790 – 098 210 3223\ndinhduong@trungnguyentw.com\ntrungnguyentw.com","accent_color":"#fc7400","title_color":"#FFFFFF","frame_image":"/brands/trungnguyen/frame_left.png","feature_image":"/brands/trungnguyen/sample_cover_2.jpg","logo_scale":"1.5","logo_offset_y":"60"}'
 
 echo "=== Done ==="
